@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Main</title>
-    <link type="image/png" sizes="16x16" rel="icon" href="./ico.png">
         
     <link rel="stylesheet" href="./lib/bootstrap-5.1.3/css/bootstrap.min.css">
 
@@ -15,6 +14,27 @@
 
 <body>
   <?php include "./header.html" ?>
+
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link" aria-current="page" href="./schedule.php">Stundenplan</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="./subsplan.php">Vertretungsplan</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="./calendar.php">Kalender</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="./tasks.php">Anstehende Aufgaben</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="./notes.php">Notitzen</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="./settings.php">Einstellungen</a>
+    </li>
+</ul>
 
 
 </body>

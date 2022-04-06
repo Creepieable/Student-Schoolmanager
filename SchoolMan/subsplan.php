@@ -20,13 +20,13 @@
       <a class="nav-link" aria-current="page" href="./schedule.php">Stundenplan</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="./subsplan.php">Vertretungsplan</a>
+      <a class="nav-link active" href="./subsplan.php">Vertretungsplan</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="./calendar.php">Kalender</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link active" href="./tasks.php">Anstehende Aufgaben</a>
+      <a class="nav-link" href="./tasks.php">Anstehende Aufgaben</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="./notes.php">Notitzen</a>
