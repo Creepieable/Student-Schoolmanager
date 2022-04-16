@@ -1,5 +1,5 @@
 const monthName = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","October","November","Dezember"];
-const weekdayName = ["Sonntag", "Montag", "Dienstag", "Mitwoch", "Donnerstag", "Freitag", "Samstag"];
+const weekdayName = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 let currentDate = new Date();
 
 $( document ).ready(function() {  
@@ -48,8 +48,6 @@ function buildTableRow (date){
             $row.addClass('bg-light');
         }
     }
-    
-    
 
     $date.attr('scope', 'row').text(date.getDate() + '. ' + (date.getMonth()+1) + '.');
     $day.text(weekdayName[date.getDay()]);
@@ -81,7 +79,6 @@ function setButtonNames(date){
 }
 
 // helper functions
-
 function daysInMonth (month, year) {
     return new Date(year, month+1, 0).getDate();
 }
