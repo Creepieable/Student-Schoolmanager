@@ -9,7 +9,7 @@ $( document ).ready(function() {
 $(document).on("click",".cal-btn", function () {
     var clickedBtnID = $(this).attr('id');
     nextPrevDate(clickedBtnID);
- });
+});
 
 function updateCalendar(){
     setTableH(currentDate);
