@@ -29,7 +29,7 @@
       <a class="nav-link active" href="./tasks.php">Anstehende Aufgaben</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="./notes.php">Notitzen</a>
+      <a class="nav-link" href="./notes.php">Notizen</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="./settings.php">Einstellungen</a>

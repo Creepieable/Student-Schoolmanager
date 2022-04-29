@@ -1,4 +1,4 @@
-var json = {
+const json = {
     schedules:[
         {
         type: "schedule",

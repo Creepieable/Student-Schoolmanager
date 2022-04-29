@@ -1,9 +1,49 @@
+const json = {
+    month: 3,
+    year: 2022,
+    tasks:[
+        {
+            title:'Essen essen',
+            due:1651667400000, //Wednesday, 4. May 2022 12:30:00
+            note:null,
+            withTime:true
+        },
+        {
+            title:'Geschichte Test',
+            due:1651671900000, //Wednesday, 4. May 2022 13:45:00
+            note:12,
+            withTime:true
+        },
+        {
+            title:'Raum 213 Veanstaltung',
+            due:1651852800000, //Friday, 6. May 2022 16:00:00
+            note:null,
+            withTime:true
+        },
+        {
+            title:'Abiturvorbereitung',
+            due:1670341500000, //Tuesday, 6. December 2022 15:45:00
+            note:132,
+            withTime:false
+        },
+    ]
+}
+
 const monthName = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","October","November","Dezember"];
 const weekdayName = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 let currentDate = new Date();
 
-$( document ).ready(function() {  
-    updateCalendar();
+$( document ).ready(function() {
+    let url = new URL(window.location.href);
+    if (!(url.searchParams.has('m') && url.searchParams.has('y'))) {
+        setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        updateCalendar();    
+    }
+    else{
+        currentDate.setMonth(url.searchParams.get('m'));
+        currentDate.setFullYear(url.searchParams.get('y'));
+        updateCalendar(); 
+    }
 });
 
 $(document).on("click",".cal-btn", function () {
@@ -52,16 +92,21 @@ function buildTableRow (date){
     $date.attr('scope', 'row').text(date.getDate() + '. ' + (date.getMonth()+1) + '.');
     $day.text(weekdayName[date.getDay()]);
 
+    $tasks.addClass('fw-bold');
+    $tasks.html(getDaysTasksString(date));
+
     $row.append($date).append($day).append($tasks);
     return $row;
 }
 
 function nextPrevDate(btn){
     if(btn == 'next-btn'){
-        currentDate = new Date(currentDate.setMonth(currentDate.getMonth()+1));    
+        currentDate = new Date(currentDate.setMonth(currentDate.getMonth()+1));
+        setURLBar(currentDate.getMonth(), currentDate.getFullYear());    
     }
     if(btn == 'prev-btn'){
         currentDate = new Date(currentDate.setMonth(currentDate.getMonth()-1));
+        setURLBar(currentDate.getMonth(), currentDate.getFullYear());
 
         console.log(currentDate);
     }
@@ -76,6 +121,43 @@ function setTableH(date){
 function setButtonNames(date){
     $('#prev-btn').text(monthName[new Date(date.getFullYear(), date.getMonth()-1).getMonth()]);
     $('#next-btn').text(monthName[new Date(date.getFullYear(), date.getMonth()+1).getMonth()]);
+}
+
+function setURLBar(m, y){
+    let url = new URL(window.location.href);
+    url.searchParams.delete('m');
+    url.searchParams.delete('y');
+    url.searchParams.set('m', m);
+    url.searchParams.set('y', y);
+
+    window.history.pushState('', '',url.toString());
+
+    return url;
+}
+
+function getDaysTasksString(date){
+    let HTMLstring = '';
+    let lBr = false;
+    $.each(json.tasks, function( index, value ) {
+        let taskDate = new Date(value.due);
+        if(date.getDate() == taskDate.getDate() && date.getMonth() == taskDate.getMonth() && date.getFullYear() == taskDate.getFullYear()){
+            let taskHTMLStr = value.title;
+
+            if(value.note != null){
+                taskHTMLStr = taskHTMLStr + ' (<a href="#">Notiz<a>)';
+            }
+
+            if(!lBr){ 
+                HTMLstring = HTMLstring + taskHTMLStr;
+                lBr = true;
+            }
+            else{
+                HTMLstring = HTMLstring + '<br>' + taskHTMLStr;
+            }
+        }
+    });
+
+    return HTMLstring;
 }
 
 // helper functions
