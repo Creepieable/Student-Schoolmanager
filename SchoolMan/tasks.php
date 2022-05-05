@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="./lib/bootstrap-5.1.3/css/bootstrap.min.css">
 
     <script src="./lib/JQuery/js/jquery-3.6.0.min.js"></script>
+    <script src="./lib/js-cookie/js.cookie.min.js"></script>
     <script src="./lib/bootstrap-5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/userMan.js"></script>
 </head>
 
 <body>

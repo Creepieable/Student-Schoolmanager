@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="./lib/bootstrap-5.1.3/css/bootstrap.min.css">
 
     <script src="./lib/JQuery/js/jquery-3.6.0.min.js"></script>
+    <script src="./lib/js-cookie/js.cookie.min.js"></script>
     <script src="./lib/bootstrap-5.1.3/js/bootstrap.bundle.min.js"></script>
     <script src="./js/login.js"></script>
 
@@ -26,19 +27,19 @@
             <h1 class="text-white">Login:</h1>
             <form class="p-2 bg-light border rounded">
                 <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Email Addresse / Nutzername:</label>
-                <input type="text" class="form-control" id="exampleInputEmail1">
+                <label for="name-inp" class="form-label">Email Addresse / Nutzername:</label>
+                <input type="text" class="form-control" id="name-inp">
                 </div>
                 <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Passwort:</label>
-                <input type="password" class="form-control" id="exampleInputPassword1">
+                <label for="pw-inp" class="form-label">Passwort:</label>
+                <input type="password" class="form-control" id="pw-inp">
                 <div hidden id="pwIncorr" class="form-text border rounded px-2 py-1 text-danger border-danger bg-white">Passwort oder Nutzername falsch!</div>
                 </div>
                 <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">angemeldet bleiben</label>
+                <input type="checkbox" class="form-check-input" id="keep-check">
+                <label class="form-check-label" for="keep-check">angemeldet bleiben</label>
                 </div>
-                <button type="button" class="btn btn-primary">Anmelden</button>
+                <button type="button" class="btn btn-primary" id="submit-btn">Anmelden</button>
                 <div class="form-text text-end">Noch kein Account?: <a href="./register.html">account erstellen</a></div>
             </form>
           </div>
