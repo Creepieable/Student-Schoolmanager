@@ -102,15 +102,67 @@ function buildTableRow (date){
 }
 
 function setNewDateByButton(btn){
-    if(btn == 'next-btn'){
-        currentDate = new Date(currentDate.setMonth(currentDate.getMonth()+1));
-        setURLBar(currentDate.getMonth(), currentDate.getFullYear());    
-    }
-    if(btn == 'prev-btn'){
-        currentDate = new Date(currentDate.setMonth(currentDate.getMonth()-1));
-        setURLBar(currentDate.getMonth(), currentDate.getFullYear());
-
-        console.log(currentDate);
+    switch(btn) {
+        case 'prev-btn':
+            currentDate.setFullYear(currentDate.getFullYear()-1);
+            currentDate.setMonth(11);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());  
+        break;
+        case 'next-btn':
+            currentDate.setFullYear(currentDate.getFullYear()+1);
+            currentDate.setMonth(0);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break;
+        case 'jan-btn':
+            currentDate.setMonth(0);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break;         
+        case 'feb-btn':
+            currentDate.setMonth(1);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'merz-btn':
+            currentDate.setMonth(2);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'apr-btn':
+            currentDate.setMonth(3);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'mai-btn':
+            currentDate.setMonth(4);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'jun-btn':
+            currentDate.setMonth(5);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'jul-btn':
+            currentDate.setMonth(6);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'aug-btn':
+            currentDate.setMonth(7);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'sep-btn':
+            currentDate.setMonth(8);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'okt-btn':
+           currentDate.setMonth(9);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'nov-btn':
+            currentDate.setMonth(10);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break; 
+        case 'dec-btn':
+            currentDate.setMonth(11);
+            setURLBar(currentDate.getMonth(), currentDate.getFullYear());
+        break;
+        default:
+            currentDate = new Date();    
     }
 
     updateCalendar();

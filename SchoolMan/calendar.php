@@ -49,36 +49,55 @@
 
 <div class=container-md>
   <h4 class="mt-3 ms-2" id="table-h">2022</h4>
-    <table class="table">
-      <thead id='calendart-head'>
-        <tr>
-          <th scope="col">Datum</th>
-          <th scope="col">Tag</th>
-          <th scope="col">Aufgaben</th>
-        </tr>
-      </thead>
-      <tbody id='calendart-body'>
-        <!-- filled by JS -->
-      </tbody>
-    </table>
+  <div class="text-center">
+    <button id="akt" type="button" class="btn btn-primary cal-btn">heute</button>
+    <div class="btn-group" role="group">
+      <button id="prev-btn" type="button" class="btn btn-secondary cal-btn"><</button>
+      <button id="jan-btn" type="button" class="btn btn-primary cal-btn">Jan</button>
+      <button id="feb-btn" type="button" class="btn btn-primary cal-btn">Feb</button>
+      <button id="merz-btn" type="button" class="btn btn-primary cal-btn">Merz</button>
+      <button id="apr-btn" type="button" class="btn btn-primary cal-btn">Apr</button>
+      <button id="mai-btn" type="button" class="btn btn-primary cal-btn">Mai</button>
+      <button id="jun-btn" type="button" class="btn btn-primary cal-btn">Juni</button>
+      <button id="jul-btn" type="button" class="btn btn-primary cal-btn">Juli</button>
+      <button id="aug-btn" type="button" class="btn btn-primary cal-btn">Aug</button>
+      <button id="sep-btn" type="button" class="btn btn-primary cal-btn">Sept</button>
+      <button id="okt-btn" type="button" class="btn btn-primary cal-btn">Okt</button>
+      <button id="nov-btn" type="button" class="btn btn-primary cal-btn">Nov</button>
+      <button id="dec-btn" type="button" class="btn btn-primary cal-btn">Dec</button>
+      <button id="next-btn" type="button" class="btn btn-secondary cal-btn">></button>
+    </div>
+  </div>
+  <table class="table">
+    <thead id='calendart-head'>
+      <tr>
+        <th scope="col">Datum</th>
+        <th scope="col">Tag</th>
+        <th scope="col">Aufgaben</th>
+      </tr>
+    </thead>
+    <tbody id='calendart-body'>
+      <!-- filled by JS -->
+    </tbody>
+  </table>
 
-    <div class="text-center">
-      <div class="btn-group" role="group">
-        <button id="prev-btn" type="button" class="btn btn-secondary cal-btn"><</button>
-        <button id="jan-btn" type="button" class="btn btn-primary cal-btn">Jan</button>
-        <button id="feb-btn" type="button" class="btn btn-primary cal-btn">Feb</button>
-        <button id="merz-btn" type="button" class="btn btn-primary cal-btn">Merz</button>
-        <button id="apr-btn" type="button" class="btn btn-primary cal-btn">Apr</button>
-        <button id="mai-btn" type="button" class="btn btn-primary cal-btn">Mai</button>
-        <button id="jun-btn" type="button" class="btn btn-primary cal-btn">Juni</button>
-        <button id="jul-btn" type="button" class="btn btn-primary cal-btn">Juli</button>
-        <button id="aug-btn" type="button" class="btn btn-primary cal-btn">Aug</button>
-        <button id="sep-btn" type="button" class="btn btn-primary cal-btn">Sept</button>
-        <button id="okt-btn" type="button" class="btn btn-primary cal-btn">Okt</button>
-        <button id="nov-btn" type="button" class="btn btn-primary cal-btn">Nov</button>
-        <button id="dec-btn" type="button" class="btn btn-primary cal-btn">Dec</button>
-        <button id="next-btn" type="button" class="btn btn-secondary cal-btn">></button>
-      </div>
+  <div class="text-center">
+    <button id="akt" type="button" class="btn btn-primary cal-btn">heute</button>
+    <div class="btn-group" role="group">
+      <button id="prev-btn" type="button" class="btn btn-secondary cal-btn"><</button>
+      <button id="jan-btn" type="button" class="btn btn-primary cal-btn">Jan</button>
+      <button id="feb-btn" type="button" class="btn btn-primary cal-btn">Feb</button>
+      <button id="merz-btn" type="button" class="btn btn-primary cal-btn">Merz</button>
+      <button id="apr-btn" type="button" class="btn btn-primary cal-btn">Apr</button>
+      <button id="mai-btn" type="button" class="btn btn-primary cal-btn">Mai</button>
+      <button id="jun-btn" type="button" class="btn btn-primary cal-btn">Juni</button>
+      <button id="jul-btn" type="button" class="btn btn-primary cal-btn">Juli</button>
+      <button id="aug-btn" type="button" class="btn btn-primary cal-btn">Aug</button>
+      <button id="sep-btn" type="button" class="btn btn-primary cal-btn">Sept</button>
+      <button id="okt-btn" type="button" class="btn btn-primary cal-btn">Okt</button>
+      <button id="nov-btn" type="button" class="btn btn-primary cal-btn">Nov</button>
+      <button id="dec-btn" type="button" class="btn btn-primary cal-btn">Dec</button>
+      <button id="next-btn" type="button" class="btn btn-secondary cal-btn">></button>
     </div>
   </div>
 </div>
