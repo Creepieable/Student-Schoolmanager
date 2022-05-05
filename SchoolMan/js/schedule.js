@@ -1,4 +1,6 @@
 const json = {
+    user:"blabla",
+    type:"schedules",
     schedules:[
         {
         type: "schedule",

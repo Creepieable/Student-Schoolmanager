@@ -1,4 +1,6 @@
 const json = {
+    user:"blabla",
+    type:"dateTasks",
     month: 3,
     year: 2022,
     tasks:[
@@ -48,7 +50,7 @@ $( document ).ready(function() {
 
 $(document).on("click",".cal-btn", function () {
     var clickedBtnID = $(this).attr('id');
-    nextPrevDate(clickedBtnID);
+    setNewDateByButton(clickedBtnID);
 });
 
 function updateCalendar(){
@@ -99,7 +101,7 @@ function buildTableRow (date){
     return $row;
 }
 
-function nextPrevDate(btn){
+function setNewDateByButton(btn){
     if(btn == 'next-btn'){
         currentDate = new Date(currentDate.setMonth(currentDate.getMonth()+1));
         setURLBar(currentDate.getMonth(), currentDate.getFullYear());    
@@ -119,8 +121,8 @@ function setTableH(date){
 }
 
 function setButtonNames(date){
-    $('#prev-btn').text(monthName[new Date(date.getFullYear(), date.getMonth()-1).getMonth()]);
-    $('#next-btn').text(monthName[new Date(date.getFullYear(), date.getMonth()+1).getMonth()]);
+    $('#prev-btn').text(date.getFullYear()-1);
+    $('#next-btn').text(date.getFullYear()+1);
 }
 
 function setURLBar(m, y){
