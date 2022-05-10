@@ -1,12 +1,13 @@
-var errMsg;
+var errMsg, err;
 
 $( document ).ready(function() {
     errMsg = $('#errMsg');
     errMsg.hide();
 
     $(document).on('click','#btn-reg', function () {
-        let name = $('#inp-pw').val();
-        let email = $('#inp-pw-rep').val();
+        err = 0;
+        let name = $('#inp-name').val();
+        let email = $('#inp-mail').val();
         let pw1 = $('#inp-pw').val();
         let pw2 = $('#inp-pw-rep').val();
 
@@ -16,35 +17,36 @@ $( document ).ready(function() {
             if(check == -1){
                 errMsg.text('Passwörter sind nicht identisch!');
                 errMsg.show();
+                err++;
             }
             if(check == -2){
                 errMsg.html('Passwort:<br>- mindestens 8 Zeichen<br>- mindesten eine Zahl, einen Groß- und Kleinbuchstabe');
                 errMsg.show();
+                err++;
             }
-        }
-        else{
-            errMsg.hide();
         }
 
         //validating Email on Client side
         if(!validateEmailRegex(email)){
             errMsg.text('Email Adresse ist Fasch.');
             errMsg.show();
-        } 
-        else{
-            errMsg.hide();
+            err++;
         }
 
         //validating Username
         if(!validateUsername(name)){
             errMsg.text('Nutzername ungültig.');
             errMsg.show();
-        }
-        else{
-            errMsg.hide();   
+            err++;
         }
 
-        let response = postRegistration(name, email, pw1);
+
+
+        let response;
+        if(err <= 0) {
+            response = postRegistration(name, email, pw1);
+            errMsg.hide();
+        }
     });
 });
 
@@ -86,11 +88,28 @@ function postRegistration(username, email, password){
             salt: salt
         }
     }
+
+    console.log('ajax sending:');
     console.log(postJSON);
+    $.ajax({
+        url: "./API/usrmngm.php",
+        type: 'POST',
+        headers: {"usr-mgm-type":"register"},
+        data: JSON.stringify(postJSON),
+        //dataType: "json",
+        success: function(text) {
+            console.log('done');
+            console.log(text);
+        },
+        error: function(xhr, status, error){
+            var errorMessage = xhr.status + ': ' + xhr.statusText
+            console.log('Error - ' + errorMessage);
+            console.log(error);
+        }
+    });
 }
 
 const characters ='!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
-
 function generateString(length) {
     let result = ' ';
     const charactersLength = characters.length;
