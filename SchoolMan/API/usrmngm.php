@@ -29,6 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = json_decode($json);
         tokenAvail($data);
     }
+    else if($_SERVER['HTTP_USR_MGM_TYPE'] === 'logout'){
+        //header('Content-Type: application/json; charset=utf-8');
+        $json = trim(file_get_contents("php://input"));
+        $data = json_decode($json);
+        logout($data);
+    }
     else{
         //echo "Error 400: bad request";
         http_response_code(400); exit();
@@ -170,7 +176,7 @@ function tokenAvail($POSTjson){
         http_response_code(500);
         exit();
     }
-    $stmt = $db->prepare('SELECT userID FROM logintokens WHERE token=?;');
+    $stmt = $db->prepare('SELECT userID, created, expiresIn FROM logintokens WHERE token=?;');
     $userToken = strval($POSTjson->data->token);
 
     $stmt->bind_param('s', $userToken);
@@ -191,10 +197,20 @@ function tokenAvail($POSTjson){
         exit();
     }
     if($$usersFound == 0){
+        $regObj = new \stdClass();
+        $regObj->type = 'token';
+        $regObj->status = 'unavail';
+
+        $respJSON = json_encode($regObj);
+        echo $respJSON;
         http_response_code(404); exit();
     }
     else{
         http_response_code(500); exit();
     }
+}
+
+logout($POSTjson){
+
 }
 ?>

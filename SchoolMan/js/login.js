@@ -63,7 +63,7 @@ function login(){
             md.start();  
             md.update(salt+pw, "utf8");  
             let saltedPw = md.digest().toHex();
-
+            
             let postJSON = {
                 request:"GET",
                 type:"login",
