@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 29, 2022 at 11:07 AM
+-- Generation Time: May 11, 2022 at 08:25 AM
 -- Server version: 10.4.13-MariaDB
 -- PHP Version: 7.4.8
 
@@ -113,6 +113,7 @@ CREATE TABLE `users` (
   `name` varchar(32) NOT NULL,
   `email` text NOT NULL,
   `passwd` text NOT NULL,
+  `salt` text CHARACTER SET armscii8 NOT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -120,9 +121,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`userID`, `name`, `email`, `passwd`, `created`) VALUES
-(1, 'testPerson', 'test@testmail.com', '123456789', '2022-04-21 11:23:53'),
-(2, 'secondTest', 'second@test.com', '987654321', '2022-04-21 11:24:22');
+INSERT INTO `users` (`userID`, `name`, `email`, `passwd`, `salt`, `created`) VALUES
+(1, 'testPerson', 'test@testmail.com', '123456789', '', '2022-04-21 11:23:53'),
+(2, 'secondTest', 'second@test.com', '987654321', '', '2022-04-21 11:24:22'),
+(3, 'test', 'test@test.test', 'dfasjfnasn', 'djakjsdl', '2022-05-10 08:11:17');
 
 --
 -- Indexes for dumped tables
@@ -210,7 +212,7 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `userID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
