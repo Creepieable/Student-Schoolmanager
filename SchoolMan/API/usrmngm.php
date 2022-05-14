@@ -1,8 +1,5 @@
 <?php
-$dbHost = 'localhost';
-$dbUsr = 'root';
-$dbPw = '';
-$dbName = 'schoolman';
+include 'credentials.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if($_SERVER['HTTP_USR_MGM_TYPE'] === 'register'){
@@ -40,12 +37,24 @@ else if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         logout($token);
     }
     else{
-        //echo "Error 400: bad request";
+        $regObj = new \stdClass();
+        $regObj->type = 'API';
+        $regObj->status = 'error';
+        $regObj->error = 'bad request headers';
+    
+        $respJSON = json_encode($regObj);
+        echo $respJSON;
         http_response_code(400); exit();
     }
 }
 else{
-    echo "Error 405: worng request method";
+    $regObj = new \stdClass();
+    $regObj->type = 'API';
+    $regObj->status = 'error';
+    $regObj->error = 'wrong request method';
+
+    $respJSON = json_encode($regObj);
+    echo $respJSON;
     http_response_code(405); exit();
 }
 
@@ -283,7 +292,24 @@ function logout($token){
         http_response_code(500); exit();   
 
     }
-    echo "done"; exit();
+    
+    //send response as JSON
+    if($db -> affected_rows > 0){
+        $regObj = new \stdClass();
+        $regObj->type = 'logout';
+        $regObj->status = 'done';
+
+        $respJSON = json_encode($regObj);
+        echo $respJSON; exit();
+    }
+    else{
+        $regObj = new \stdClass();
+        $regObj->type = 'logout';
+        $regObj->status = 'noChange';
+
+        $respJSON = json_encode($regObj);
+        echo $respJSON; exit();
+    }
 }
 
 function tokenAvail($POSTjson){
