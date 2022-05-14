@@ -56,14 +56,83 @@ else{
 }
 
 function addCalendarEntry(){
+    global $db, $token;
     //get request json
     $requestBody = trim(file_get_contents("php://input"));
     $requestObj = json_decode($requestBody);
 
+    $title = $requestObj->data->title;
+    $dueStamp = $requestObj->data->dueStamp;
+    $isTimed = $requestObj->data->isTimed;
+    $colour = $requestObj->data->colour;
+
+    $noteIDs = $requestObj->data->noteIDs;
+
+    //limit to max Notes of 5
+    if(count($noteIDs) > 5){
+        $regObj = new \stdClass();
+        $regObj->type = 'calendar';
+        $regObj->status = 'error';
+        $regObj->error = 'noteLimit';
+
+        $respJSON = json_encode($regObj);
+        echo $respJSON;
+        http_response_code(403); exit();   
+    }
+
+    try {
+        $stmt = $db->prepare('INSERT INTO tasks (userID, title, dueBy, isTimed, colour)
+                                VALUES (
+                                    (SELECT userID FROM logintokens 
+                                        WHERE logintokens.token = ?),
+                                    ?, UNIX_TIMESTAMP(?), ?, ?);');
+        $stmt->bind_param('ssiii', $token, $title, $dueStamp, $isTimed, $colour);
+        $stmt->execute();
+    } catch (Exception $e) {
+        $regObj = new \stdClass();
+        $regObj->type = 'calendar';
+        $regObj->status = 'error';
+        $regObj->error = 'unknown';
+
+        $respJSON = json_encode($regObj);
+        echo $respJSON;
+        http_response_code(500); exit();   
+    }
+
+    $last_id = $db->insert_id;
+    foreach ($noteIDs as &$id){
+        try {
+            $stmt = $db->prepare('UPDATE notes
+                                    SET taskID = ?
+                                        WHERE noteID = ? 
+                                        AND userID = (SELECT userID FROM logintokens WHERE logintokens.token = ?);');
+            $stmt->bind_param('iis', $last_id, $id, $token);
+            $stmt->execute();
+        } catch (Exception $e) {
+            $respObj = new \stdClass();
+            $respObj->type = 'calendar';
+            $respObj->status = 'error';
+            $respObj->error = 'unknown';
+            //$respObj->message = $e->getMessage();
     
+            $respJSON = json_encode($respObj);
+            echo $respJSON;
+            http_response_code(500); exit();   
+        }
+        
+        //MAYBE: catch unchanged rows
+
+        $respObj = new \stdClass();
+        $respObj->type = 'calendar';
+        $respObj->status = 'done';;
+
+        $respJSON = json_encode($respObj);
+        echo $respJSON; exit();
+    }
 }  
 
 function getCalendarEntrys(){
+    global $db, $token;
     if(!isset($_SERVER['HTTP_CALENDAR_FROM_STAMP']) || !isset($_SERVER['HTTP_CALENDAR_TO_STAMP'])){
         $respObj = new \stdClass();
         $respObj->type = 'calendar';
@@ -76,18 +145,36 @@ function getCalendarEntrys(){
     }
     $fromDate = $_SERVER['HTTP_CALENDAR_FROM_STAMP'];
     $toDate = $_SERVER['HTTP_CALENDAR_TO_STAMP'];
-
-    //setup DB connection
-    global $db, $token;
     
-    /*SELECT taskID, title, UNIX_TIMESTAMP(dueBy) AS dueBy, isTimed, colour FROM tasks 
-	INNER JOIN logintokens ON tasks.userID = logintokens.userID 
-	WHERE logintokens.token = "6dccf1e1d227c69fbdf816647e7755527a0f8cfb2f1dff4d311ee1720a3f4265"
-			AND UNIX_TIMESTAMP(dueBy) > 0
-			AND UNIX_TIMESTAMP(dueBy) < 2652555455;*/
+    try {
+        //TODO: SELECT Note IDs
+        $stmt = $db->prepare('SELECT taskID, title, UNIX_TIMESTAMP(dueBy) AS dueBy, isTimed, colour FROM tasks 
+                                INNER JOIN logintokens ON tasks.userID = logintokens.userID 
+                                WHERE logintokens.token = ?
+                                        AND UNIX_TIMESTAMP(dueBy) > ?
+                                        AND UNIX_TIMESTAMP(dueBy) < ?;');
+        $stmt->bind_param('sii', $token, $fromDate, $toDate);
+        $stmt->execute();
+    
+    } catch (Exception $e) {
+        $regObj = new \stdClass();
+        $regObj->type = 'calendar';
+        $regObj->status = 'error';
+        $regObj->error = 'unknown';
+
+        $respJSON = json_encode($regObj);
+        echo $respJSON;
+        http_response_code(500); exit();   
+    }
+
+    $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    //TODO: JSON BUILDING
+    var_dump($result);
 }
 
 function dropCalendarEntry(){
+    global $db, $token;
     if(!isset($_SERVER['HTTP_CALENDAR_ENTRY_ID'])){
         $respObj = new \stdClass();
         $respObj->type = 'calendar';
@@ -100,8 +187,6 @@ function dropCalendarEntry(){
     }
     $entry = $_SERVER['HTTP_CALENDAR_ENTRY_ID'];
     
-    global $db, $token;
-
     try {
     $stmt = $db->prepare('DELETE FROM tasks 
                             WHERE userID = ( SELECT userID FROM logintokens 
