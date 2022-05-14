@@ -1,3 +1,15 @@
+//check token availability and redirect
+if(validateCurrentToken()){
+    window.location.href = "./calendar.php";
+}
+else{
+    Cookies.remove('__scman_us_t');
+}
+
+$(document).on('click','#submit-btn', function () {  
+    login();
+});
+
 const json = {
     user:"blabla",
     type:"dateTasks",

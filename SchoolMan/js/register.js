@@ -39,12 +39,8 @@ $( document ).ready(function() {
             errMsg.show();
             err++;
         }
-
-
-
-        let response;
         if(err <= 0) {
-            response = postRegistration(name, email, pw1);
+            postRegistration(name, email, pw1);
             errMsg.hide();
         }
     });
@@ -73,10 +69,9 @@ function validateUsername(nameStr){
     const nameRegex = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
     return nameRegex.test(nameStr);
 }
-
 function postRegistration(username, email, password){
     let salt = generateString(20);
-    let pwHash = sha256(salt+password);
+    let pwHash = hash(salt+password);
 
     let postJSON = {
         request:"POST",
@@ -96,15 +91,21 @@ function postRegistration(username, email, password){
         type: 'POST',
         headers: {"usr-mgm-type":"register"},
         data: JSON.stringify(postJSON),
-        //dataType: "json",
+        dataType: "json",
         success: function(text) {
             console.log('done');
-            console.log(text);
+            //console.log(text);
         },
         error: function(xhr, status, error){
-            var errorMessage = xhr.status + ': ' + xhr.statusText
-            console.log('Error - ' + errorMessage);
-            console.log(error);
+            if(xhr.status === 403){
+                errMsg.text('Ein Nutzer mit diesem Namen oder dieser Email existiert bereits.');
+                errMsg.show();
+            }
+            else{
+                var errorMessage = xhr.status + ': ' + xhr.statusText
+                console.error('Error - ' + errorMessage);
+                console.log(error);
+            }
         }
     });
 }
@@ -116,15 +117,5 @@ function generateString(length) {
     for ( let i = 0; i < length; i++ ) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-
     return result;
 }
-
-function sha256(inp)
-	{
-	    var md = forge.md.sha256.create();  
-        md.start();  
-        md.update(inp, "utf8");  
-        var hashText = md.digest().toHex();  
-        return hashText;
-    } 

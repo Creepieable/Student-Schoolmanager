@@ -1,42 +1,14 @@
-if(Cookies.get('__scman_us_t') !== undefined){
-    let token = Cookies.get('__scman_us_t');
-    
-    let postJSON = {
-        request:"POST",
-        type:"token",
-        data:{
-            token: token
-        }
-    }
-
-    $.ajax({
-        url: "./API/usrmngm.php",
-        type: 'POST',
-        headers: {"usr-mgm-type":"token"},
-        data: JSON.stringify(postJSON),
-        //dataType: "json",
-        success: function(text) {
-            console.log(text);
-            
-            if(text.data.status === "avail"){
-                window.location.href = "./calendar.php";
-            }
-            else{
-                Cookies.remove('__scman_us_t');
-            }
-        },
-        error: function(xhr, status, error){
-            var errorMessage = xhr.status + ': ' + xhr.statusText
-            console.log('Error - ' + errorMessage);
-            console.log(error);
-        }
-    });
+//check token availability and redirect
+if(validateCurrentToken()){
+    window.location.href = "./calendar.php";
+}
+else{
+    Cookies.remove('__scman_us_t');
 }
 
 $(document).on('click','#submit-btn', function () {  
     login();
 });
-
 
 function login(){
     let name = $('#name-inp').val();
@@ -57,18 +29,16 @@ function login(){
         data: JSON.stringify(postJSON),
         dataType: "json",
         success: function(text) {
+            console.log(text);
             let salt = text.data.salt;
 
-            var md = forge.md.sha256.create();  
-            md.start();  
-            md.update(salt+pw, "utf8");  
-            let saltedPw = md.digest().toHex();
+            let saltedPw = hash(salt+password)
             
             let postJSON = {
                 request:"GET",
                 type:"login",
                 data:{
-                    user: name,
+                    name: name,
                     password: saltedPw
                 }
             }
