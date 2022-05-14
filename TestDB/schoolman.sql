@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="js/vendor/codemirror/lib/codemirror.css?v=5.1.3">
     <link rel="stylesheet" type="text/css" href="js/vendor/codemirror/addon/hint/show-hint.css?v=5.1.3">
     <link rel="stylesheet" type="text/css" href="js/vendor/codemirror/addon/lint/lint.css?v=5.1.3">
-    <link rel="stylesheet" type="text/css" href="./themes/pmahomme/css/theme.css?v=5.1.3&nocache=4107782011ltr&server=1">
+    <link rel="stylesheet" type="text/css" href="./themes/pmahomme/css/theme.css?v=5.1.3&nocache=1115175494ltr&server=1">
     <link rel="stylesheet" type="text/css" href="./themes/pmahomme/css/printview.css?v=5.1.3" media="print" id="printcss">
     <title>localhost / 127.0.0.1 | phpMyAdmin 5.1.3</title>
     <script data-cfasync="false" type="text/javascript" src="js/vendor/jquery/jquery.min.js?v=5.1.3"></script>
@@ -260,7 +260,7 @@ $(function() {
       </div>
       <div id="pma_navigation_tree" class="list_container synced highlight autoexpand">
 
-  <div class="pma_quick_warp"><div class="drop_list"><button title="Letzte Tabellen" class="drop_button btn">Letzte</button><ul id="pma_recent_list"><li class="warp_link"><a href="index.php?route=/table/recent-favorite&db=schoolman&table=logintokens">`schoolman`.`logintokens`</a></li><li class="warp_link"><a href="index.php?route=/table/recent-favorite&db=schoolman&table=users">`schoolman`.`users`</a></li></ul></div><div class="drop_list"><button title="Favoriten-Tabellen" class="drop_button btn">Favoriten</button><ul id="pma_favorite_list"><li class="warp_link">Es gibt keine Favoriten-Tabellen.</li></ul></div><div class="clearfloat"></div></div>
+  <div class="pma_quick_warp"><div class="drop_list"><button title="Letzte Tabellen" class="drop_button btn">Letzte</button><ul id="pma_recent_list"><li class="warp_link"><a href="index.php?route=/table/recent-favorite&db=schoolman&table=tasks">`schoolman`.`tasks`</a></li><li class="warp_link"><a href="index.php?route=/table/recent-favorite&db=schoolman&table=schedule">`schoolman`.`schedule`</a></li><li class="warp_link"><a href="index.php?route=/table/recent-favorite&db=schoolman&table=logintokens">`schoolman`.`logintokens`</a></li><li class="warp_link"><a href="index.php?route=/table/recent-favorite&db=schoolman&table=users">`schoolman`.`users`</a></li></ul></div><div class="drop_list"><button title="Favoriten-Tabellen" class="drop_button btn">Favoriten</button><ul id="pma_favorite_list"><li class="warp_link">Es gibt keine Favoriten-Tabellen.</li></ul></div><div class="clearfloat"></div></div>
 
 <div class="clearfloat"></div>
 
@@ -636,6 +636,82 @@ $.extend(defaultValues, {
                     </span>
             </div>
                             <span class="query">SELECT * FROM `logintokens`</span>
+                        </div>
+                                            <div class="message history collapsed hide select"
+                            targetdb="schoolman" targettable="schedule">
+                            <div class="action_content">
+                    <span class="action collapse">
+            Zuklappen
+                    </span>
+                            <span class="action expand">
+            Aufklappen
+                    </span>
+                            <span class="action requery">
+            Erneut abfragen
+                    </span>
+                            <span class="action edit">
+            Bearbeiten
+                    </span>
+                            <span class="action explain">
+            Erklären
+                    </span>
+                            <span class="action profiling">
+            Messen
+                    </span>
+                            <span class="action bookmark">
+            Lesezeichen
+                    </span>
+                            <span class="text failed">
+            Abfrage fehlgeschlagen
+                    </span>
+                            <span class="text targetdb">
+            Datenbank
+                            : <span>schoolman</span>
+                    </span>
+                            <span class="text query_time">
+            Abfragezeit
+                            : <span>Während der aktuellen Sitzung</span>
+                    </span>
+            </div>
+                            <span class="query">SELECT * FROM `schedule`</span>
+                        </div>
+                                            <div class="message history collapsed hide select"
+                            targetdb="schoolman" targettable="tasks">
+                            <div class="action_content">
+                    <span class="action collapse">
+            Zuklappen
+                    </span>
+                            <span class="action expand">
+            Aufklappen
+                    </span>
+                            <span class="action requery">
+            Erneut abfragen
+                    </span>
+                            <span class="action edit">
+            Bearbeiten
+                    </span>
+                            <span class="action explain">
+            Erklären
+                    </span>
+                            <span class="action profiling">
+            Messen
+                    </span>
+                            <span class="action bookmark">
+            Lesezeichen
+                    </span>
+                            <span class="text failed">
+            Abfrage fehlgeschlagen
+                    </span>
+                            <span class="text targetdb">
+            Datenbank
+                            : <span>schoolman</span>
+                    </span>
+                            <span class="text query_time">
+            Abfragezeit
+                            : <span>Während der aktuellen Sitzung</span>
+                    </span>
+            </div>
+                            <span class="query">SELECT * FROM `tasks`</span>
                         </div>
                                                 </div><!-- console_message_container -->
             <div class="query_input">
