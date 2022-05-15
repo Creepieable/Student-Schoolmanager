@@ -1,46 +1,51 @@
 //check token availability and redirect
-if(validateCurrentToken()){
-    window.location.href = "./calendar.php";
-}
-else{
+if(!validateCurrentToken()){
+    window.location.href = "./index.php";
     Cookies.remove('__scman_us_t');
 }
+
+let token = Cookies.get('__scman_us_t');
 
 $(document).on('click','#submit-btn', function () {  
     login();
 });
 
-const json = {
-    user:"blabla",
-    type:"dateTasks",
-    month: 3,
-    year: 2022,
-    tasks:[
-        {
-            title:'Essen essen',
-            due:1651667400000, //Wednesday, 4. May 2022 12:30:00
-            note:null,
-            withTime:true
+const timezoneDiffSec = new Date().getTimezoneOffset() * 60;
+let json = 
+        {   
+            "type": "calendarTasks",
+            "from": 0,
+            "to": 0,
+            "tasks": []
+        };
+
+function updateCalendarJSON(from, to){
+    let json;
+    $.ajax({
+        url: "./API/calendar.php",
+        type: 'GET',
+        async: false,
+        headers: {  "usr-token":token,
+                    "calendar-from-stamp":from,
+                    "calendar-to-stamp":to},
+        dataType: "json",
+        success: function(text) {
+            json = text;
         },
-        {
-            title:'Geschichte Test',
-            due:1651671900000, //Wednesday, 4. May 2022 13:45:00
-            note:12,
-            withTime:true
-        },
-        {
-            title:'Raum 213 Veanstaltung',
-            due:1651852800000, //Friday, 6. May 2022 16:00:00
-            note:null,
-            withTime:true
-        },
-        {
-            title:'Abiturvorbereitung',
-            due:1670341500000, //Tuesday, 6. December 2022 15:45:00
-            note:132,
-            withTime:false
-        },
-    ]
+        error: function(xhr, status, error){
+            if(xhr.status === 403){
+                errMsg.text('Ein Nutzer mit diesem Namen oder dieser Email existiert bereits.');
+                errMsg.show();
+            }
+            else{
+                var errorMessage = xhr.status + ': ' + xhr.statusText
+                console.error('Error - ' + errorMessage);
+                console.log(error);
+            }
+        }
+    });
+    
+    return json;
 }
 
 const monthName = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","October","November","Dezember"];
@@ -66,6 +71,19 @@ $(document).on("click",".cal-btn", function () {
 });
 
 function updateCalendar(){
+    var firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    var lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 23, 59, 59, 999);
+
+    var from = Math.floor(firstDay / 1000) - timezoneDiffSec;
+    var to = Math.floor(lastDay / 1000) - timezoneDiffSec;
+
+    console.log(from);
+    console.log(to);
+    console.log(timezoneDiffSec);
+
+    json = updateCalendarJSON(from, to);
+    console.log(json);
+
     setTableH(currentDate);
     setButtonNames(currentDate);  
     buildTable();
@@ -195,7 +213,6 @@ function setURLBar(m, y){
     url.searchParams.delete('y');
     url.searchParams.set('m', m);
     url.searchParams.set('y', y);
-
     window.history.pushState('', '',url.toString());
 
     return url;
@@ -205,7 +222,7 @@ function getDaysTasksString(date){
     let HTMLstring = '';
     let lBr = false;
     $.each(json.tasks, function( index, value ) {
-        let taskDate = new Date(value.due);
+        let taskDate = new Date((value.dueBy + timezoneDiffSec)*1000);
         if(date.getDate() == taskDate.getDate() && date.getMonth() == taskDate.getMonth() && date.getFullYear() == taskDate.getFullYear()){
             let taskHTMLStr = value.title;
 

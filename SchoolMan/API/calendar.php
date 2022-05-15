@@ -82,10 +82,9 @@ function addCalendarEntry(){
 
     try {
         $stmt = $db->prepare('INSERT INTO tasks (userID, title, dueBy, isTimed, colour)
-                                VALUES (
-                                    (SELECT userID FROM logintokens 
-                                        WHERE logintokens.token = ?),
-                                    ?, UNIX_TIMESTAMP(?), ?, ?);');
+                                VALUES ((SELECT userID FROM logintokens 
+                                    WHERE logintokens.token = ?),
+                                ?, UNIX_TIMESTAMP(?), ?, ?);');
         $stmt->bind_param('ssiii', $token, $title, $dueStamp, $isTimed, $colour);
         $stmt->execute();
     } catch (Exception $e) {
@@ -100,6 +99,7 @@ function addCalendarEntry(){
     }
 
     $last_id = $db->insert_id;
+    $notEffected = 0;
     foreach ($noteIDs as &$id){
         try {
             $stmt = $db->prepare('UPDATE notes
@@ -119,14 +119,25 @@ function addCalendarEntry(){
             echo $respJSON;
             http_response_code(500); exit();   
         }
-        
-        //MAYBE: catch unchanged rows
 
+        if($db -> affected_rows == 0) $notEffected++;
+    }
+    
+    if($notEffected = 0 || count($noteIDs) <= 0){
         $respObj = new \stdClass();
         $respObj->type = 'calendar';
         $respObj->status = 'done';;
 
         $respJSON = json_encode($respObj);
+        echo $respJSON; exit();
+    }
+    else{
+        $regObj = new \stdClass();
+        $regObj->type = 'calendar';
+        $regObj->status = 'warning';
+        $regObj->warning = $notEffected.' notes not effected';
+
+        $respJSON = json_encode($regObj);
         echo $respJSON; exit();
     }
 }  
@@ -151,8 +162,8 @@ function getCalendarEntrys(){
         $stmt = $db->prepare('SELECT taskID, title, UNIX_TIMESTAMP(dueBy) AS dueBy, isTimed, colour FROM tasks 
                                 INNER JOIN logintokens ON tasks.userID = logintokens.userID 
                                 WHERE logintokens.token = ?
-                                        AND UNIX_TIMESTAMP(dueBy) > ?
-                                        AND UNIX_TIMESTAMP(dueBy) < ?;');
+                                        AND UNIX_TIMESTAMP(dueBy) BETWEEN ? AND ?
+                                ORDER BY UNIX_TIMESTAMP(dueBy);');
         $stmt->bind_param('sii', $token, $fromDate, $toDate);
         $stmt->execute();
     
@@ -169,8 +180,26 @@ function getCalendarEntrys(){
 
     $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-    //TODO: JSON BUILDING
-    var_dump($result);
+    $respObj = new \stdClass();
+    $respObj->type = 'calendarTasks';
+    $respObj->from = $fromDate;
+    $respObj->to = $toDate;
+
+    $tasks = [];
+    foreach ($result as &$entry){
+        $taskObj = new \stdClass();
+        $taskObj->title = $entry["title"];
+        $taskObj->dueBy = $entry["dueBy"];
+        $taskObj->isTimed = boolval($entry["isTimed"]);
+        $taskObj->color = dechex($entry["colour"]);
+
+        array_push($tasks, $taskObj);
+    }
+
+    $respObj->tasks = $tasks;
+
+    $respJSON = json_encode($respObj);
+    echo $respJSON; exit();
 }
 
 function dropCalendarEntry(){
@@ -220,7 +249,8 @@ function dropCalendarEntry(){
     else{
         $regObj = new \stdClass();
         $regObj->type = 'calendar';
-        $regObj->status = 'noChange';
+        $regObj->status = 'warning';
+        $regObj->status = 'no effect';
 
         $respJSON = json_encode($regObj);
         echo $respJSON; exit();

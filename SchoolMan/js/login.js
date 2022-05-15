@@ -32,7 +32,7 @@ function login(){
             console.log(text);
             let salt = text.data.salt;
 
-            let saltedPw = hash(salt+password)
+            let saltedPw = hash(salt+pw)
             
             let postJSON = {
                 request:"GET",
