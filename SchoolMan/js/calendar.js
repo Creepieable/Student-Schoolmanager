@@ -74,8 +74,8 @@ function updateCalendar(){
     var firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     var lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 23, 59, 59, 999);
 
-    var from = Math.floor(firstDay / 1000) - timezoneDiffSec;
-    var to = Math.floor(lastDay / 1000) - timezoneDiffSec;
+    var from = Math.floor(firstDay / 1000);// - timezoneDiffSec;
+    var to = Math.floor(lastDay / 1000);// - timezoneDiffSec;
 
     console.log(from);
     console.log(to);
@@ -222,7 +222,7 @@ function getDaysTasksString(date){
     let HTMLstring = '';
     let lBr = false;
     $.each(json.tasks, function( index, value ) {
-        let taskDate = new Date((value.dueBy + timezoneDiffSec)*1000);
+        let taskDate = new Date((value.dueBy)*1000);// + timezoneDiffSec)*1000);
         if(date.getDate() == taskDate.getDate() && date.getMonth() == taskDate.getMonth() && date.getFullYear() == taskDate.getFullYear()){
             let taskHTMLStr = value.title;
 

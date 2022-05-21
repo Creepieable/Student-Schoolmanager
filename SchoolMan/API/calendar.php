@@ -144,27 +144,29 @@ function addCalendarEntry(){
 
 function getCalendarEntrys(){
     global $db, $token;
-    if(!isset($_SERVER['HTTP_CALENDAR_FROM_STAMP']) || !isset($_SERVER['HTTP_CALENDAR_TO_STAMP'])){
-        $respObj = new \stdClass();
-        $respObj->type = 'calendar';
-        $respObj->status = 'error';
-        $respObj->error = 'missing header data';
-    
-        $respJSON = json_encode($respObj);
-        echo $respJSON;
-        http_response_code(400); exit();
-    }
-    $fromDate = $_SERVER['HTTP_CALENDAR_FROM_STAMP'];
-    $toDate = $_SERVER['HTTP_CALENDAR_TO_STAMP'];
-    
-    try {
-        //TODO: SELECT Note IDs
+    $stmt = NULL;
+    $fromDate = NULL;
+    $toDate = NULL;
+    if(isset($_SERVER['HTTP_CALENDAR_FROM_STAMP']) || isset($_SERVER['HTTP_CALENDAR_TO_STAMP'])){
+        $fromDate = $_SERVER['HTTP_CALENDAR_FROM_STAMP'];
+        $toDate = $_SERVER['HTTP_CALENDAR_TO_STAMP'];
         $stmt = $db->prepare('SELECT taskID, title, UNIX_TIMESTAMP(dueBy) AS dueBy, isTimed, colour FROM tasks 
                                 INNER JOIN logintokens ON tasks.userID = logintokens.userID 
                                 WHERE logintokens.token = ?
                                         AND UNIX_TIMESTAMP(dueBy) BETWEEN ? AND ?
                                 ORDER BY UNIX_TIMESTAMP(dueBy);');
         $stmt->bind_param('sii', $token, $fromDate, $toDate);
+    }
+    else{
+        $stmt = $db->prepare('SELECT taskID, title, UNIX_TIMESTAMP(dueBy) AS dueBy, isTimed, colour FROM tasks 
+                                INNER JOIN logintokens ON tasks.userID = logintokens.userID 
+                                WHERE logintokens.token = ?
+                                ORDER BY UNIX_TIMESTAMP(dueBy);');
+        $stmt->bind_param('s', $token);   
+    }
+    
+    try {
+        //TODO: SELECT Note IDs
         $stmt->execute();
     
     } catch (Exception $e) {
@@ -191,7 +193,7 @@ function getCalendarEntrys(){
         $taskObj->title = $entry["title"];
         $taskObj->dueBy = $entry["dueBy"];
         $taskObj->isTimed = boolval($entry["isTimed"]);
-        $taskObj->color = dechex($entry["colour"]);
+        $taskObj->color = $entry["colour"];
 
         array_push($tasks, $taskObj);
     }
