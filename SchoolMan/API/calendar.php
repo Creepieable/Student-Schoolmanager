@@ -68,18 +68,6 @@ function addCalendarEntry(){
 
     $noteIDs = $requestObj->data->noteIDs;
 
-    //limit to max Notes of 5
-    if(count($noteIDs) > 5){
-        $regObj = new \stdClass();
-        $regObj->type = 'calendar';
-        $regObj->status = 'error';
-        $regObj->error = 'noteLimit';
-
-        $respJSON = json_encode($regObj);
-        echo $respJSON;
-        http_response_code(403); exit();   
-    }
-
     try {
         $stmt = $db->prepare('INSERT INTO tasks (userID, title, dueBy, isTimed, colour)
                                 VALUES ((SELECT userID FROM logintokens 
@@ -99,43 +87,43 @@ function addCalendarEntry(){
     }
 
     $last_id = $db->insert_id;
-    $notEffected = 0;
-    foreach ($noteIDs as &$id){
-        try {
-            $stmt = $db->prepare('UPDATE notes
-                                    SET taskID = ?
-                                        WHERE noteID = ? 
-                                        AND userID = (SELECT userID FROM logintokens WHERE logintokens.token = ?);');
-            $stmt->bind_param('iis', $last_id, $id, $token);
-            $stmt->execute();
-        } catch (Exception $e) {
-            $respObj = new \stdClass();
-            $respObj->type = 'calendar';
-            $respObj->status = 'error';
-            $respObj->error = 'unknown';
-            //$respObj->message = $e->getMessage();
     
-            $respJSON = json_encode($respObj);
-            echo $respJSON;
-            http_response_code(500); exit();   
-        }
+    //prepare array stmt
+    $count = count($noteIDs);
+    $placeholders = implode(',', array_fill(0, $count, '?'));
+    $bindStr = str_repeat('i', $count);
 
-        if($db -> affected_rows == 0) $notEffected++;
+    try{
+        $stmt = $db->prepare("UPDATE notes
+                                SET taskID = ?
+                                    WHERE userID = (SELECT userID FROM logintokens WHERE logintokens.token = ?)
+                                AND noteID IN ($placeholders);");
+        $stmt->bind_param("is".$bindStr, $last_id, $token, ...$noteIDs);
+        $stmt->execute();
+    } catch (Exception $e) {
+        $regObj = new \stdClass();
+        $regObj->type = 'calendar';
+        $regObj->status = 'error';
+        $regObj->error = 'unknown';
+
+        $respJSON = json_encode($regObj);
+        echo $respJSON;
+        http_response_code(500); exit();   
     }
     
-    if($notEffected = 0 || count($noteIDs) <= 0){
+    if($db->affected_rows == count($noteIDs)){
         $respObj = new \stdClass();
-        $respObj->type = 'calendar';
-        $respObj->status = 'done';;
+        $respObj->type = 'notes';
+        $respObj->status = 'done';
 
         $respJSON = json_encode($respObj);
         echo $respJSON; exit();
     }
     else{
         $regObj = new \stdClass();
-        $regObj->type = 'calendar';
+        $regObj->type = 'notes';
         $regObj->status = 'warning';
-        $regObj->warning = $notEffected.' notes not effected';
+        $regObj->warning = count($noteIDs)-$db->affected_rows.' notes not effected';
 
         $respJSON = json_encode($regObj);
         echo $respJSON; exit();
