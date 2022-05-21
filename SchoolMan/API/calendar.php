@@ -87,7 +87,7 @@ function addCalendarEntry(){
     }
 
     $last_id = $db->insert_id;
-    
+
     //prepare array stmt
     $count = count($noteIDs);
     $placeholders = implode(',', array_fill(0, $count, '?'));
@@ -154,7 +154,6 @@ function getCalendarEntrys(){
     }
     
     try {
-        //TODO: SELECT Note IDs
         $stmt->execute();
     
     } catch (Exception $e) {
@@ -168,20 +167,69 @@ function getCalendarEntrys(){
         http_response_code(500); exit();   
     }
 
-    $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $taskResult = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
+    //getTaskIDs
+    $taskIDs = [];
+    foreach ($taskResult as &$entry){
+        array_push($taskIDs, $entry["taskID"]);
+    }
+    
+    //prepare array stmt
+    $count = count($taskIDs);
+    $placeholders = implode(',', array_fill(0, $count, '?'));
+    $bindStr = str_repeat('i', $count);
+
+    //get noteIDs for every requested task
+    try {
+        $stmt = $db->prepare("SELECT tasks.taskID, notes.noteID FROM notes
+                                INNER JOIN tasks ON tasks.taskID = notes.taskID
+                                INNER JOIN logintokens ON tasks.userID = logintokens.userID 
+                                WHERE logintokens.token = ?
+                                AND notes.taskID IN ($placeholders);");
+        $stmt->bind_param("s".$bindStr, $token, ...$taskIDs);
+        $stmt->execute();
+    
+    } catch (Exception $e) {
+        $regObj = new \stdClass();
+        $regObj->type = 'calendar';
+        $regObj->status = 'error';
+        $regObj->error = 'unknown';
+
+        $respJSON = json_encode($regObj);
+        echo $respJSON;
+        http_response_code(500); exit();   
+    }
+
+    $idsResult = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    //build array with noteIDs
+    $noteIDsArr =  [];
+    foreach ($idsResult as &$entry){
+        if(!isset($noteIDsArr[$entry["taskID"]])) $noteIDsArr[$entry["taskID"]] = [];
+        if(!is_array($noteIDsArr[$entry["taskID"]])) $noteIDsArr[$entry["taskID"]] = [];
+        array_push($noteIDsArr[$entry["taskID"]], $entry["noteID"]);
+    }
+
+    //build Response
     $respObj = new \stdClass();
     $respObj->type = 'calendarTasks';
     $respObj->from = $fromDate;
     $respObj->to = $toDate;
 
     $tasks = [];
-    foreach ($result as &$entry){
+    foreach ($taskResult as &$entry){
         $taskObj = new \stdClass();
         $taskObj->title = $entry["title"];
         $taskObj->dueBy = $entry["dueBy"];
         $taskObj->isTimed = boolval($entry["isTimed"]);
         $taskObj->color = $entry["colour"];
+        if(isset($noteIDsArr[$entry["taskID"]])){
+            $taskObj->notes = $noteIDsArr[$entry["taskID"]];
+        }
+        else{
+            $taskObj->notes = NULL;   
+        }
 
         array_push($tasks, $taskObj);
     }
