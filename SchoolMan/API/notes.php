@@ -167,7 +167,7 @@ function addNodes(){
         $regObj = new \stdClass();
         $regObj->type = 'notes';
         $regObj->status = 'warning';
-        $regObj->warning = $notEffected.' notes not effected';
+        $regObj->warning = 'some notes not effected';
 
         $respJSON = json_encode($regObj);
         echo $respJSON; exit();

@@ -2,7 +2,9 @@ var errMsg, err;
 
 $( document ).ready(function() {
     errMsg = $('#errMsg');
+    sucessMsg = $('#sucessMsg');
     errMsg.hide();
+    sucessMsg.hide();
 
     $(document).on('click','#btn-reg', function () {
         err = 0;
@@ -94,7 +96,8 @@ function postRegistration(username, email, password){
         dataType: "json",
         success: function(text) {
             console.log('done');
-            //console.log(text);
+            sucessMsg.show();
+            setTimeout(redirect, 4000);
         },
         error: function(xhr, status, error){
             if(xhr.status === 403){
@@ -118,4 +121,8 @@ function generateString(length) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+}
+
+function redirect() {
+    window.location.href = "./index.html";   
 }
