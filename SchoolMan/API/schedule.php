@@ -61,23 +61,26 @@ function getSchedule(){
     $stmt = NULL;
     try{
         if(isset($_SERVER['HTTP_SCHEDULE_ID'])){
+            $stmt = $db->prepare("SELECT schedule.scheduleID, scheduleentry.row, scheduleentry.row, scheduleentry.monday, scheduleentry.tuesday, scheduleentry.wednesday, scheduleentry.thursday, scheduleentry.friday, scheduleentry.time
+                                    FROM schedule
+                                    INNER JOIN scheduleentry
+                                    ON schedule.scheduleID = scheduleentry.scheduleID
+                                    WHERE schedule.userID = ( SELECT userID FROM logintokens WHERE logintokens.token = ?)
+                                    AND schedule.scheduleID = ?
+                                    ORDER BY schedule.scheduleID ,scheduleentry.row;");
+            $stmt->bind_param('si', $token, $_SERVER['HTTP_SCHEDULE_ID']);
+        }
+        else{
             $stmt = $db->prepare("SELECT schedule.scheduleID, scheduleentry.row, scheduleentry.monday, scheduleentry.tuesday, scheduleentry.wednesday, scheduleentry.thursday, scheduleentry.friday, scheduleentry.time
                                     FROM schedule
                                     INNER JOIN scheduleentry
                                     ON schedule.scheduleID = scheduleentry.scheduleID
                                     WHERE schedule.userID = ( SELECT userID FROM logintokens WHERE logintokens.token = ?)
-                                    AND schedule.scheduleID = ?;");
-            $stmt->bind_param('si', $token, $_SERVER['HTTP_SCHEDULE_ID']);
-        }
-        else{
-            $stmt = $db->prepare("SELECT schedule.scheduleID, scheduleentry.monday, scheduleentry.tuesday, scheduleentry.wednesday, scheduleentry.thursday, scheduleentry.friday, scheduleentry.time
-                                    FROM schedule
-                                    INNER JOIN scheduleentry
-                                    ON schedule.scheduleID = scheduleentry.scheduleID
-                                    WHERE schedule.userID = ( SELECT userID FROM logintokens WHERE logintokens.token = ?);");
+                                    ORDER BY schedule.scheduleID ,scheduleentry.row;");
             $stmt->bind_param('s', $token);
         }
     $stmt->execute();
+
     } catch (Exception $e) {
         $regObj = new \stdClass();
         $regObj->type = 'schedule';
@@ -94,15 +97,33 @@ function getSchedule(){
     
     $respObj = new \stdClass();
     $respObj->type = 'schedule';
-    $respObj->data = [];
 
-    $schedules = [];
+    $schedules = new \stdClass();
     foreach($scheduleResult as &$entry){
-        $schedules[$entry->scheduleID] = $entry;
+        $id = $entry["scheduleID"];
+        $row = $entry["row"];
+
+        $days = new \stdClass();
+        foreach(['monday','tuesday','wednesday','thursday','friday'] as &$key){
+            $days->$key = $entry[$key];
+        }
+
+        if(!isset($schedules->$id)) $schedules->$id = [];
+
+        $rowObj = new \stdClass();
+        $rowObj->scheduleID = $id;
+        $rowObj->row = $row;
+        $rowObj->time = $entry["time"];
+        $rowObj->days = $days;
+
+
+        array_push($schedules->$id, $rowObj);
     }
 
-    print_r($schedules);
+    $respObj->data = $schedules;
 
+    $respJSON = json_encode($respObj);
+    echo $respJSON; exit();
 }
 
 function addSchedule(){
@@ -145,7 +166,8 @@ function addSchedule(){
             else array_push($sqlArray, NULL);
         }
         
-        array_push($sqlArray, $unit->time);
+        if(property_exists($unit, 'time')) array_push($sqlArray, $unit->time);
+        else array_push($sqlArray, NULL);
     }
 
     //insert schedule entrys

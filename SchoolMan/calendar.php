@@ -29,10 +29,10 @@
 
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link" aria-current="page" href="./schedule.php">Stundenplan</a>
+      <a class="nav-link disabled" aria-current="page" href="./schedule.php">Stundenplan</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="./subsplan.php">Vertretungsplan</a>
+      <a class="nav-link disabled" href="./subsplan.php">Vertretungsplan</a>
     </li>
     <li class="nav-item">
       <a class="nav-link active" href="./calendar.php">Kalender</a>
@@ -44,16 +44,18 @@
       <a class="nav-link" href="./notes.php">Notizen</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="./settings.php">Einstellungen</a>
+      <a class="nav-link disabled" href="./settings.php">Einstellungen</a>
     </li>
 </ul>
 
 <div class=container-md>
   <h4 class="mt-3 ms-2" id="table-h">2022</h4>
+  
   <div class="text-center">
+    <button type="button" class="btn btn-success add-task">neuer Termin</button>
     <button id="akt" type="button" class="btn btn-primary cal-btn">heute</button>
     <div class="btn-group" role="group">
-      <button id="prev-btn" type="button" class="btn btn-secondary cal-btn"><</button>
+    <button id="prev-btn" type="button" class="btn btn-secondary cal-btn prev-btn"><</button>
       <button id="jan-btn" type="button" class="btn btn-primary cal-btn">Jan</button>
       <button id="feb-btn" type="button" class="btn btn-primary cal-btn">Feb</button>
       <button id="merz-btn" type="button" class="btn btn-primary cal-btn">Merz</button>
@@ -66,7 +68,7 @@
       <button id="okt-btn" type="button" class="btn btn-primary cal-btn">Okt</button>
       <button id="nov-btn" type="button" class="btn btn-primary cal-btn">Nov</button>
       <button id="dec-btn" type="button" class="btn btn-primary cal-btn">Dec</button>
-      <button id="next-btn" type="button" class="btn btn-secondary cal-btn">></button>
+      <button id="next-btn" type="button" class="btn btn-secondary cal-btn next-btn">></button>
     </div>
   </div>
   <table class="table">
@@ -85,7 +87,7 @@
   <div class="text-center">
     <button id="akt" type="button" class="btn btn-primary cal-btn">heute</button>
     <div class="btn-group" role="group">
-      <button id="prev-btn" type="button" class="btn btn-secondary cal-btn"><</button>
+      <button id="prev-btn" type="button" class="btn btn-secondary cal-btn prev-btn"><</button>
       <button id="jan-btn" type="button" class="btn btn-primary cal-btn">Jan</button>
       <button id="feb-btn" type="button" class="btn btn-primary cal-btn">Feb</button>
       <button id="merz-btn" type="button" class="btn btn-primary cal-btn">Merz</button>
@@ -98,7 +100,7 @@
       <button id="okt-btn" type="button" class="btn btn-primary cal-btn">Okt</button>
       <button id="nov-btn" type="button" class="btn btn-primary cal-btn">Nov</button>
       <button id="dec-btn" type="button" class="btn btn-primary cal-btn">Dec</button>
-      <button id="next-btn" type="button" class="btn btn-secondary cal-btn">></button>
+      <button id="next-btn" type="button" class="btn btn-secondary cal-btn next-btn">></button>
     </div>
   </div>
 </div>

@@ -19,10 +19,10 @@
 
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link" aria-current="page" href="./schedule.php">Stundenplan</a>
+      <a class="nav-link disabled" aria-current="page" href="./schedule.php">Stundenplan</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="./subsplan.php">Vertretungsplan</a>
+      <a class="nav-link disabled" href="./subsplan.php">Vertretungsplan</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="./calendar.php">Kalender</a>

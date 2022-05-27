@@ -87,31 +87,35 @@ function addCalendarEntry(){
     }
 
     $last_id = $db->insert_id;
+    $effected = 0;
+    if(count($noteIDs)>0){
+        //prepare array stmt
+        $count = count($noteIDs);
+        $placeholders = implode(',', array_fill(0, $count, '?'));
+        $bindStr = str_repeat('i', $count);
 
-    //prepare array stmt
-    $count = count($noteIDs);
-    $placeholders = implode(',', array_fill(0, $count, '?'));
-    $bindStr = str_repeat('i', $count);
+        try{
+            $stmt = $db->prepare("UPDATE notes
+                                    SET taskID = ?
+                                        WHERE userID = (SELECT userID FROM logintokens WHERE logintokens.token = ?)
+                                    AND noteID IN ($placeholders);");
+            $stmt->bind_param("is".$bindStr, $last_id, $token, ...$noteIDs);
+            $stmt->execute();
+        } catch (Exception $e) {
+            $regObj = new \stdClass();
+            $regObj->type = 'calendar';
+            $regObj->status = 'error';
+            $regObj->error = 'unknown';
 
-    try{
-        $stmt = $db->prepare("UPDATE notes
-                                SET taskID = ?
-                                    WHERE userID = (SELECT userID FROM logintokens WHERE logintokens.token = ?)
-                                AND noteID IN ($placeholders);");
-        $stmt->bind_param("is".$bindStr, $last_id, $token, ...$noteIDs);
-        $stmt->execute();
-    } catch (Exception $e) {
-        $regObj = new \stdClass();
-        $regObj->type = 'calendar';
-        $regObj->status = 'error';
-        $regObj->error = 'unknown';
+            $respJSON = json_encode($regObj);
+            echo $respJSON;
+            http_response_code(500); exit();   
+        }
 
-        $respJSON = json_encode($regObj);
-        echo $respJSON;
-        http_response_code(500); exit();   
+        $effected = $db->affected_rows;
     }
     
-    if($db->affected_rows == count($noteIDs)){
+    if($effected == count($noteIDs)){
         $respObj = new \stdClass();
         $respObj->type = 'notes';
         $respObj->status = 'done';
@@ -161,6 +165,7 @@ function getCalendarEntrys(){
         $regObj->type = 'calendar';
         $regObj->status = 'error';
         $regObj->error = 'unknown';
+        $regObj->error = 'error getting calendar';
 
         $respJSON = json_encode($regObj);
         echo $respJSON;
@@ -181,34 +186,38 @@ function getCalendarEntrys(){
     $bindStr = str_repeat('i', $count);
 
     //get noteIDs for every requested task
-    try {
-        $stmt = $db->prepare("SELECT tasks.taskID, notes.noteID FROM notes
-                                INNER JOIN tasks ON tasks.taskID = notes.taskID
-                                INNER JOIN logintokens ON tasks.userID = logintokens.userID 
-                                WHERE logintokens.token = ?
-                                AND notes.taskID IN ($placeholders);");
-        $stmt->bind_param("s".$bindStr, $token, ...$taskIDs);
-        $stmt->execute();
-    
-    } catch (Exception $e) {
-        $regObj = new \stdClass();
-        $regObj->type = 'calendar';
-        $regObj->status = 'error';
-        $regObj->error = 'unknown';
-
-        $respJSON = json_encode($regObj);
-        echo $respJSON;
-        http_response_code(500); exit();   
-    }
-
-    $idsResult = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
-    //build array with noteIDs
     $noteIDsArr =  [];
-    foreach ($idsResult as &$entry){
-        if(!isset($noteIDsArr[$entry["taskID"]])) $noteIDsArr[$entry["taskID"]] = [];
-        if(!is_array($noteIDsArr[$entry["taskID"]])) $noteIDsArr[$entry["taskID"]] = [];
-        array_push($noteIDsArr[$entry["taskID"]], $entry["noteID"]);
+    if(count($taskResult) > 0){
+        try {
+            $sql = "SELECT tasks.taskID, notes.noteID FROM notes
+                        INNER JOIN tasks ON tasks.taskID = notes.taskID
+                        INNER JOIN logintokens ON tasks.userID = logintokens.userID 
+                        WHERE logintokens.token = ?
+                        AND notes.taskID IN ($placeholders);";
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param("s".$bindStr, $token, ...$taskIDs);
+            $stmt->execute();
+        
+        } catch (Exception $e) {
+            $regObj = new \stdClass();
+            $regObj->type = 'calendar';
+            $regObj->status = 'error';
+            $regObj->error = 'unknown';
+            $regObj->error = 'error getting note IDs';
+
+            $respJSON = json_encode($regObj);
+            echo $respJSON;
+            http_response_code(500); exit();   
+        }
+
+        $idsResult = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        //build array with noteIDs
+        foreach ($idsResult as &$entry){
+            if(!isset($noteIDsArr[$entry["taskID"]])) $noteIDsArr[$entry["taskID"]] = [];
+            if(!is_array($noteIDsArr[$entry["taskID"]])) $noteIDsArr[$entry["taskID"]] = [];
+            array_push($noteIDsArr[$entry["taskID"]], $entry["noteID"]);
+        }
     }
 
     //build Response
@@ -220,6 +229,7 @@ function getCalendarEntrys(){
     $tasks = [];
     foreach ($taskResult as &$entry){
         $taskObj = new \stdClass();
+        $taskObj->taskID = $entry["taskID"];
         $taskObj->title = $entry["title"];
         $taskObj->dueBy = $entry["dueBy"];
         $taskObj->isTimed = boolval($entry["isTimed"]);

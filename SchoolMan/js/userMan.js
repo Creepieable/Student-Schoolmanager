@@ -1,9 +1,11 @@
+const userToken = Cookies.get('__scman_us_t');
+
 $(document).on('click','#logout-btn', function () {
     let token = Cookies.get('__scman_us_t');
     $.ajax({
         url: "./API/usrmngm.php",
         type: 'DELETE',
-        headers: {"usr-mgm-type":"token",
+        headers: {"usr-mgm-type":"logout",
                   "usr-token":token},
         success: function() {
             Cookies.remove('__scman_us_t');
@@ -13,14 +15,13 @@ $(document).on('click','#logout-btn', function () {
             var errorMessage = xhr.status + ': ' + xhr.statusText
             console.log('Error - ' + errorMessage);
             console.log(error);
+            console.log(xhr.responseText);
         }
     });
 });
 
-function validateCurrentToken(){
-    if(Cookies.get('__scman_us_t') !== undefined){
-        let token = Cookies.get('__scman_us_t');
-        
+function validateCurrentToken(token){
+    if(Cookies.get('__scman_us_t') !== undefined){        
         let postJSON = {
             request:"POST",
             type:"tokenAvail",

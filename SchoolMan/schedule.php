@@ -23,7 +23,7 @@
       <a class="nav-link active" aria-current="page" href="./schedule.php">Stundenplan</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="./subsplan.php">Vertretungsplan</a>
+      <a class="nav-link disabled" href="./subsplan.php">Vertretungsplan</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="./calendar.php">Kalender</a>
@@ -35,7 +35,7 @@
       <a class="nav-link" href="./notes.php">Notizen</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="./settings.php">Einstellungen</a>
+      <a class="nav-link disabled" href="./settings.php">Einstellungen</a>
     </li>
 </ul>
 <br>
