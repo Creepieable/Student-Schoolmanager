@@ -52,7 +52,7 @@
   <h4 class="mt-3 ms-2" id="table-h">2022</h4>
   
   <div class="text-center">
-    <button type="button" class="btn btn-success add-task">neuer Termin</button>
+  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newTaskModal">neuer Termin</button>
     <button id="akt" type="button" class="btn btn-primary cal-btn">heute</button>
     <div class="btn-group" role="group">
     <button id="prev-btn" type="button" class="btn btn-secondary cal-btn prev-btn"><</button>
@@ -105,11 +105,13 @@
   </div>
 </div>
 
-<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Toggle right offcanvas</button>
 
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+<!-- Note Offcanvas element -->
+<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNotes" aria-controls="offcanvasNotes">Toggle right offcanvas</button>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNotes" aria-labelledby="offcanvasNotesLabel">
   <div class="offcanvas-header">
-    <h5 id="offcanvasRightLabel">Notiz: ...</h5>
+    <h5 id="offcanvasNotesLabel">Notiz: ...</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
@@ -120,6 +122,62 @@
     <img width='80%' src="https://cdn.pixabay.com/photo/2019/02/06/17/09/snake-3979601__480.jpg" class="rounded mx-auto d-block" alt="...">
     <br>
     <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+  </div>
+</div>
+
+<!-- new Task Modal -->
+<div class="modal fade " id="newTaskModal" tabindex="-1" aria-labelledby="newTaskModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newTaskModalTitle">Neuer Termin:</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="mein neuer Termin..." id="taskTitleInput">
+          <input type="color" class="form-control form-control-color" id="taskColourInput" value="#0d6efd" style="max-width: 40px;">
+        </div>
+        <div class="row" >
+          <div class="col-auto">
+            <input type="date" id="taskDate" name="trip-start">
+          </div>
+          <div class="col-auto form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="wholeDayCheck" checked>
+            <label class="form-check-label" for="wholeDayCheck">Ganztägig</label>
+          </div>
+          <div class="col-auto"> <!--hidden by default-->
+            <input type="time" id="taskTime" value="12:00">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">abbrechen</button>
+        <button id="addTask" type="button" class="btn btn-success" data-bs-dismiss="modal">Termin hinzufügen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--del confirm Modal-->
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmModalLabel">Wirklich löschen?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="margin-right: auto;">abbrechen</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confimDelete">löschen</button>
+      </div>
+    </div>
   </div>
 </div>
 </body>

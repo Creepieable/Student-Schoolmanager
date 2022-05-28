@@ -9,6 +9,11 @@ else{
 $(document).on('click','#submit-btn', function () {  
     login();
 });
+$('.loginTB').on("keypress", function(e){
+    if(e.which == 13){
+        $("body").append("<p>You've pressed the enter key!</p>");
+    }
+});
 
 function login(){
     let name = $('#name-inp').val();
