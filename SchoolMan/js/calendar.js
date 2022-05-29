@@ -64,7 +64,7 @@ $(document).ready(function() {
     });
 
     //initialize date picker to todays date
-    $('#taskDate').val(formatDate(currentDate));
+    $('#taskDate').val(formatDateString(currentDate));
 });
 
 ////load calender
@@ -147,7 +147,7 @@ function updateCalendarHTML(response){
                 $taskNoteLink.css("color", '#'+value.colour);
                     
                 $taskSpan.attr('noteIDs', value.notes);
-                $taskSpan.attr('taskID', value.taskID);
+                $taskSpan.attr('id', value.taskID);
 
                 $taskNoteLink.text(value.title + ' (Notizen)');
 
@@ -175,7 +175,7 @@ function updateCalendarHTML(response){
                 //add task show notes event
                 $taskNoteLink.click(function () {
                     var noteIDsString = $(this).parent().attr('noteIDs');
-                    var taskID = $(this).parent().attr('taskID');
+                    var taskID = $(this).parent().attr('id');
 
                     var taskTitle = $(this).text();
                     taskTitle = taskTitle.slice(0, taskTitle.lastIndexOf('('));
@@ -300,10 +300,12 @@ function showNotes(taskID, taskTitle, noteIDs){
         $.ajax({
             url: "./API/notes.php",
             type: 'GET',
+            cache: false,
             headers: {"usr-token":userToken,
                       "note-ids": noteIDs.toString()},
             dataType: "json",
             success: function(response) {
+                console.log(response);
                 fillNoteDisp(response);
             },
             error: function(xhr, status, error){
@@ -339,7 +341,7 @@ function createNoteCard(noteID, title, text){
                         </div>');
         
     $noteCard.attr('noteID', noteID);       
-    console.log(noteID);         
+
     $noteCard.find('.card-header-text').text(title);
     $noteCard.find('.card-text').text(text);
 
@@ -385,7 +387,9 @@ function writeNewNoteForTask(taskID){
             $('#noteTextInput').val('');
             
             //append to Notes
-            $('#offcanvas-notes-body').append(createNoteCard(response.added, noteTitle, noteText)); 
+            $('#offcanvas-notes-body').append(createNoteCard(response.added, noteTitle, noteText));
+            $taskButton = $('#'+$('#offcanvasNotes').attr('taskID'));
+            addNoteID($taskButton, response.added);
         },
         error: function(xhr, status, error){
             var errorMessage = xhr.status + ': ' + xhr.statusText
@@ -441,6 +445,9 @@ function addNotesByIDs(taskID, noteIDs){
                     $.each(response.notes, function( index, value ) {
                         $('#offcanvas-notes-body').append(createNoteCard(value.noteID, value.title, value.text));
                     });
+
+                    $taskButton = $('#'+$('#offcanvasNotes').attr('taskID'));
+                    addNoteID($taskButton, noteIDs);
                 },
                 error: function(xhr, status, error){
                     var errorMessage = xhr.status + ': ' + xhr.statusText
@@ -462,10 +469,10 @@ function addNotesByIDs(taskID, noteIDs){
 }
 
 //remove note from task
-let rmNoteID = null;
+let rmID = null;
 let rmNoteElem = null;
 function removeNoteFromtask(noteID, noteElem){
-    rmNoteID = noteID;
+    rmID = noteID;
     rmNoteElem = noteElem;
     var deleteConfirmModal = new bootstrap.Modal(document.getElementById('rmNoteConfirmModal'));
     deleteConfirmModal.show();
@@ -475,11 +482,14 @@ function removeNoteFromtaskConfirm(){
         url: "./API/notes.php",
         type: 'PATCH',
         headers: {"usr-token":userToken,
-                  "note-ids":rmNoteID.toString()
+                  "note-ids":rmID.toString()
                 },
         dataType: "json",
         success: function(response) {
             $(rmNoteElem).remove();
+
+            $taskButton = $('#'+$('#offcanvasNotes').attr('taskID'));
+            rmNoteID($taskButton, rmID);
         },
         error: function(xhr, status, error){
             var errorMessage = xhr.status + ': ' + xhr.statusText
@@ -579,12 +589,12 @@ function setURLBar(m, y){
     return url;
 }
 
-//other helper funtions
+////other helper funtions
 function daysInMonth (month, year) {
     return new Date(year, month+1, 0).getDate();
 }
 
-function formatDate(date) {
+function formatDateString(date) {
     var d = new Date(date),
         month = '' + (d.getMonth() + 1),
         day = '' + d.getDate(),
@@ -596,4 +606,23 @@ function formatDate(date) {
         day = '0' + day;
 
     return [year, month, day].join('-');
+}
+
+function addNoteID($buttonElem, addID){
+    let ids = ($buttonElem.attr('noteIDs').split(','));
+    ids.push(addID);
+    $buttonElem.attr('noteIDs', ids.toString());
+}
+
+function rmNoteID($buttonElem, rmID){
+    let ids = ($buttonElem.attr('noteIDs')).split(',');
+    
+    
+    var idIndex = ids.indexOf(rmID.toString());
+    if (idIndex !== -1) {
+        ids.splice(idIndex, 1);
+    }
+
+    console.log(ids);
+    $buttonElem.attr('noteIDs', ids.toString());
 }
