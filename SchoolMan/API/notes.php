@@ -116,7 +116,7 @@ function getNotes(){
         $taskObj->noteID = $note["noteID"];
         $taskObj->title = $note["title"];
         $taskObj->text = $note["text"];
-        $taskObj->color = $note["colour"];
+        $taskObj->colour = $note["colour"];
 
         array_push($notes, $taskObj);
     }

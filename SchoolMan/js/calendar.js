@@ -155,7 +155,7 @@ function updateCalendarHTML(response){
 
                 if(value.isTimed){
                     let timeStr = taskDate.toLocaleTimeString()
-                    let $timeDisp = $('<span class="fw-bold ms-1"></span>');
+                    let $timeDisp = $('<span class="fw-bold ms-1" style="color: black;"></span>');
                     $timeDisp.text(timeStr.slice(0, timeStr.lastIndexOf(':')));
                     $taskSpan.append($taskNoteLink).append($timeDisp).append($taskDelLink);
                 }
@@ -209,12 +209,7 @@ function addTask(){
     let taskDateStr = $('#taskDate').val();
     let taskTime = $('#taskTime').val();
 
-    //---------!!!!---------
-    //TODO: FIX wrong date upon adding new task
-    //---------!!!!---------
-
-    //this does not give the right date
-    //maybe add time zoine offset to Timestamp!!!!!!!!!!!
+    //get js date from string
     console.log(taskDateStr+'T'+taskTime+':00');
     let taskDate = new Date(taskDateStr+'T'+taskTime+':00');
     let taskDateStamp = Math.floor(taskDate.getTime() / 1000);
@@ -286,6 +281,8 @@ function removeTaskConfirmed(){
 function showNotes(taskID, taskTitle, noteIDs){
     var offcanvasNotes = new bootstrap.Offcanvas(document.getElementById('offcanvasNotes'));
     offcanvasNotes.show();
+
+    $('#offcanvas-notes-body').empty();
     
     //set title of offcanvas
     $('#offcanvasNotesHeading').text('Notizen für: ' + taskTitle);
@@ -305,7 +302,7 @@ function showNotes(taskID, taskTitle, noteIDs){
                       "note-ids": noteIDs.toString()},
             dataType: "json",
             success: function(response) {
-                console.log(response);
+                //console.log(response);
                 fillNoteDisp(response);
             },
             error: function(xhr, status, error){
@@ -320,14 +317,14 @@ function showNotes(taskID, taskTitle, noteIDs){
 function fillNoteDisp(response){
     let $offcanvasNotesBody = $('#offcanvas-notes-body');
 
-    $offcanvasNotesBody.empty();
-
     $.each(response.notes, function( index, value ) {
-        $offcanvasNotesBody.append(createNoteCard(value.noteID, value.title, value.text));
+        $offcanvasNotesBody.append(createNoteCard(value.noteID, value.title, value.text, value.colour));
     });
 }
 
-function createNoteCard(noteID, title, text){
+function createNoteCard(noteID, title, text, colour){
+
+
     let $noteCard = $('<div class="card mb-2">\
                             <div class="card-header">\
                                 <div class="row">\
@@ -340,8 +337,12 @@ function createNoteCard(noteID, title, text){
                             </div>\
                         </div>');
         
-    $noteCard.attr('noteID', noteID);       
+    $noteCard.attr('noteID', noteID);
 
+    //change text color if bg is too dark
+    if(wc_hex_is_dark(colour)) $noteCard.find('.card-header-text').css('color', 'white');
+
+    $noteCard.find('.card-header').css('background-color', '#'+colour);
     $noteCard.find('.card-header-text').text(title);
     $noteCard.find('.card-text').text(text);
 
@@ -387,7 +388,7 @@ function writeNewNoteForTask(taskID){
             $('#noteTextInput').val('');
             
             //append to Notes
-            $('#offcanvas-notes-body').append(createNoteCard(response.added, noteTitle, noteText));
+            $('#offcanvas-notes-body').append(createNoteCard(response.added, noteTitle, noteText, noteColour.substring(1)));
             $taskButton = $('#'+$('#offcanvasNotes').attr('taskID'));
             addNoteID($taskButton, response.added);
         },
@@ -443,7 +444,7 @@ function addNotesByIDs(taskID, noteIDs){
                 dataType: "json",
                 success: function(response) {
                     $.each(response.notes, function( index, value ) {
-                        $('#offcanvas-notes-body').append(createNoteCard(value.noteID, value.title, value.text));
+                        $('#offcanvas-notes-body').append(createNoteCard(value.noteID, value.title, value.text, value.colour));
                     });
 
                     $taskButton = $('#'+$('#offcanvasNotes').attr('taskID'));
@@ -590,7 +591,7 @@ function setURLBar(m, y){
 }
 
 ////other helper funtions
-function daysInMonth (month, year) {
+function daysInMonth(month, year) {
     return new Date(year, month+1, 0).getDate();
 }
 
@@ -609,7 +610,7 @@ function formatDateString(date) {
 }
 
 function addNoteID($buttonElem, addID){
-    let ids = ($buttonElem.attr('noteIDs').split(','));
+    let ids = String($buttonElem.attr('noteIDs')).split(',');
     ids.push(addID);
     $buttonElem.attr('noteIDs', ids.toString());
 }
@@ -617,12 +618,19 @@ function addNoteID($buttonElem, addID){
 function rmNoteID($buttonElem, rmID){
     let ids = ($buttonElem.attr('noteIDs')).split(',');
     
-    
     var idIndex = ids.indexOf(rmID.toString());
     if (idIndex !== -1) {
         ids.splice(idIndex, 1);
     }
 
-    console.log(ids);
     $buttonElem.attr('noteIDs', ids.toString());
+}
+
+function wc_hex_is_dark(color) {
+    const hex = color.replace('#', '');
+    const c_r = parseInt(hex.substr(0, 2), 16);
+    const c_g = parseInt(hex.substr(2, 2), 16);
+    const c_b = parseInt(hex.substr(4, 2), 16);
+    const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+    return brightness < 155;
 }
