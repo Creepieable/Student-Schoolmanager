@@ -72,8 +72,8 @@ function addCalendarEntry(){
         $stmt = $db->prepare('INSERT INTO tasks (userID, title, dueBy, isTimed, colour)
                                 VALUES ((SELECT userID FROM logintokens 
                                     WHERE logintokens.token = ?),
-                                ?, UNIX_TIMESTAMP(?), ?, ?);');
-        $stmt->bind_param('ssiii', $token, $title, $dueStamp, $isTimed, $colour);
+                                ?, FROM_UNIXTIME(?), ?, ?);');
+        $stmt->bind_param('ssiis', $token, $title, $dueStamp, $isTimed, $colour);
         $stmt->execute();
     } catch (Exception $e) {
         $regObj = new \stdClass();
@@ -233,7 +233,7 @@ function getCalendarEntrys(){
         $taskObj->title = $entry["title"];
         $taskObj->dueBy = $entry["dueBy"];
         $taskObj->isTimed = boolval($entry["isTimed"]);
-        $taskObj->color = $entry["colour"];
+        $taskObj->colour = $entry["colour"];
         if(isset($noteIDsArr[$entry["taskID"]])){
             $taskObj->notes = $noteIDsArr[$entry["taskID"]];
         }

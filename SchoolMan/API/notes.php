@@ -36,7 +36,7 @@ $token = $_SERVER['HTTP_USR_TOKEN'];
 //--------------------
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    getNodes();
+    getNotes();
 }
 else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     addNodes();
@@ -45,7 +45,7 @@ else if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     dropNodes();
 }
 else if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
-    if(isset($_SERVER['HTTP_NOTE_IDS']) && isset($_SERVER['HTTP_TASK_ID'])){
+    if(isset($_SERVER['HTTP_NOTE_IDS'])){
         updateNodesTaskID();
     }
     else {
@@ -63,7 +63,7 @@ else{
     http_response_code(405); exit();
 }
 
-function getNodes(){
+function getNotes(){
     global $db, $token;
     $noteIDs = [];
     $stmt = NULL;
@@ -77,7 +77,7 @@ function getNodes(){
         $placeholders = implode(',', array_fill(0, $count, '?'));
         $bindStr = str_repeat('i', $count);
 
-        $stmt = $db->prepare("SELECT notes.title, notes.text, notes.colour FROM notes 
+        $stmt = $db->prepare("SELECT notes.noteID, notes.title, notes.text, notes.colour FROM notes 
         INNER JOIN logintokens ON notes.userID = logintokens.userID 
             WHERE logintokens.token = ?
             AND noteID IN ($placeholders)
@@ -86,7 +86,7 @@ function getNodes(){
     }
     else{
         //prepare all stmt
-        $stmt = $db->prepare("SELECT notes.title, notes.text, notes.colour FROM notes 
+        $stmt = $db->prepare("SELECT notes.noteID, notes.title, notes.text, notes.colour FROM notes 
                                 INNER JOIN logintokens ON notes.userID = logintokens.userID 
                                 WHERE logintokens.token = ?
                                 ORDER BY notes.noteID;");
@@ -113,8 +113,9 @@ function getNodes(){
     $notes = [];
     foreach ($result as &$note){
         $taskObj = new \stdClass();
+        $taskObj->noteID = $note["noteID"];
         $taskObj->title = $note["title"];
-        $taskObj->dueBy = $note["text"];
+        $taskObj->text = $note["text"];
         $taskObj->color = $note["colour"];
 
         array_push($notes, $taskObj);
@@ -142,7 +143,7 @@ function addNodes(){
                                 VALUES ((SELECT userID FROM logintokens 
                                     WHERE logintokens.token = ?),
                                 ?, ?, ?, ?);');
-        $stmt->bind_param('ssiii', $token, $title, $text, $taskID, $colour);
+        $stmt->bind_param('sssis', $token, $title, $text, $taskID, $colour);
         $stmt->execute();
     } catch (Exception $e) {
         $regObj = new \stdClass();
@@ -158,7 +159,8 @@ function addNodes(){
     if($db -> affected_rows > 0){
         $respObj = new \stdClass();
         $respObj->type = 'notes';
-        $respObj->status = 'done';;
+        $respObj->status = 'done';
+        $respObj->added = $db->insert_id;
 
         $respJSON = json_encode($respObj);
         echo $respJSON; exit();
@@ -231,7 +233,8 @@ function dropNodes(){
 
 function updateNodesTaskID(){
     global $db, $token;
-    $taskID = $_SERVER['HTTP_TASK_ID'];
+    if(isset($_SERVER['HTTP_TASK_ID'])) $taskID = $_SERVER['HTTP_TASK_ID'];
+    else $taskID = NULL;
 
     //split CSV IDs into array
     $noteIDs = explode(',', $_SERVER['HTTP_NOTE_IDS']);
@@ -242,11 +245,20 @@ function updateNodesTaskID(){
     $bindStr = str_repeat('i', $count);
 
     try{
-        $stmt = $db->prepare("UPDATE notes
-                                SET taskID = ?
-                                    WHERE userID = (SELECT userID FROM logintokens WHERE logintokens.token = ?)
-                                AND noteID IN ($placeholders);");
-        $stmt->bind_param("is".$bindStr, $taskID, $token, ...$noteIDs);
+        if($taskID != NULL){
+            $stmt = $db->prepare("UPDATE notes
+                                    SET taskID = ?
+                                        WHERE userID = (SELECT userID FROM logintokens WHERE logintokens.token = ?)
+                                    AND noteID IN ($placeholders);");
+            $stmt->bind_param("is".$bindStr, $taskID, $token, ...$noteIDs);
+        }
+        else{
+            $stmt = $db->prepare("UPDATE notes
+                                    SET taskID = null
+                                        WHERE userID = (SELECT userID FROM logintokens WHERE logintokens.token = ?)
+                                    AND noteID IN ($placeholders);");
+            $stmt->bind_param("s".$bindStr, $token, ...$noteIDs);
+        } 
         $stmt->execute();
     } catch (Exception $e) {
         $regObj = new \stdClass();

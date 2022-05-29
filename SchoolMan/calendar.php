@@ -55,7 +55,8 @@
   <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newTaskModal">neuer Termin</button>
     <button id="akt" type="button" class="btn btn-primary cal-btn">heute</button>
     <div class="btn-group" role="group">
-    <button id="prev-btn" type="button" class="btn btn-secondary cal-btn prev-btn"><</button>
+      <button id="prev-btn" type="button" class="btn btn-secondary cal-btn prev-btn"><</button>
+      <button id="prev-mon-btn" type="button" class="btn btn-secondary cal-btn"><</button>
       <button id="jan-btn" type="button" class="btn btn-primary cal-btn">Jan</button>
       <button id="feb-btn" type="button" class="btn btn-primary cal-btn">Feb</button>
       <button id="merz-btn" type="button" class="btn btn-primary cal-btn">Merz</button>
@@ -68,6 +69,7 @@
       <button id="okt-btn" type="button" class="btn btn-primary cal-btn">Okt</button>
       <button id="nov-btn" type="button" class="btn btn-primary cal-btn">Nov</button>
       <button id="dec-btn" type="button" class="btn btn-primary cal-btn">Dec</button>
+      <button id="next-mon-btn" type="button" class="btn btn-secondary cal-btn">></button>
       <button id="next-btn" type="button" class="btn btn-secondary cal-btn next-btn">></button>
     </div>
   </div>
@@ -88,6 +90,7 @@
     <button id="akt" type="button" class="btn btn-primary cal-btn">heute</button>
     <div class="btn-group" role="group">
       <button id="prev-btn" type="button" class="btn btn-secondary cal-btn prev-btn"><</button>
+      <button id="prev-mon-btn" type="button" class="btn btn-secondary cal-btn"><</button>
       <button id="jan-btn" type="button" class="btn btn-primary cal-btn">Jan</button>
       <button id="feb-btn" type="button" class="btn btn-primary cal-btn">Feb</button>
       <button id="merz-btn" type="button" class="btn btn-primary cal-btn">Merz</button>
@@ -100,6 +103,7 @@
       <button id="okt-btn" type="button" class="btn btn-primary cal-btn">Okt</button>
       <button id="nov-btn" type="button" class="btn btn-primary cal-btn">Nov</button>
       <button id="dec-btn" type="button" class="btn btn-primary cal-btn">Dec</button>
+      <button id="next-mon-btn" type="button" class="btn btn-secondary cal-btn">></button>
       <button id="next-btn" type="button" class="btn btn-secondary cal-btn next-btn">></button>
     </div>
   </div>
@@ -107,21 +111,24 @@
 
 
 <!-- Note Offcanvas element -->
-<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNotes" aria-controls="offcanvasNotes">Toggle right offcanvas</button>
-
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNotes" aria-labelledby="offcanvasNotesLabel">
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNotes" aria-labelledby="offcanvasNotesHeading">
   <div class="offcanvas-header">
-    <h5 id="offcanvasNotesLabel">Notiz: ...</h5>
+    <h5 id="offcanvasNotesHeading">Notien für ...</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
-    <img width='80%' src="https://img.chefkoch-cdn.de/rezepte/3146641468504732/bilder/1303719/crop-960x720/hokkaido-milk-bread.jpg" class="rounded mx-auto d-block" alt="...">
-    <br>
-    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-    <br>
-    <img width='80%' src="https://cdn.pixabay.com/photo/2019/02/06/17/09/snake-3979601__480.jpg" class="rounded mx-auto d-block" alt="...">
-    <br>
-    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+    <div id="offcanvas-notes-body">
+      <!--filled by js-->
+    </div>
+    <form class="border rounded p-2">
+      <label for="newAddInputGroup" class="form-label">Notiz hinzufügen:</label>
+      <div id="newAddInputGroup" class="input-group">
+      <select class="form-select" id="noteAddSelect">
+        <!--filled by js-->
+      </select>
+        <button class="btn btn-outline-success" type="button" id="buttonNewNote" data-bs-toggle="modal" data-bs-target="#newNoteModal">neue Notiz erstellen</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -159,13 +166,30 @@
   </div>
 </div>
 
-<!--del confirm Modal-->
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button>
+<!-- write Note Modal -->
+<div class="modal fade" id="newNoteModal" tabindex="-1" aria-labelledby="newNoteModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newNoteModalTitle">Neue Notiz:</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="meine neue Notiz..." id="noteTitleInput" required>
+          <input type="color" class="form-control form-control-color" id="noteColourInput" value="#f8f9fa" style="max-width: 40px;">
+        </div>
+        <textarea class="form-control" id="noteTextInput" style="min-height: 10em;" required></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">abbrechen</button>
+        <button id="addNoteConfirm" type="button" class="btn btn-success">Notiz hinzufügen</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<!-- Modal -->
+<!--del Task confirm Modal-->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content">
@@ -176,6 +200,22 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="margin-right: auto;">abbrechen</button>
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confimDelete">löschen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--rm Note confirm Modal-->
+<div class="modal fade" id="rmNoteConfirmModal" tabindex="-1" aria-labelledby="rmNoteConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rmNoteConfirmModalLabel">Wirklich entfernen?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="margin-right: auto;">abbrechen</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confimRemove">entfernen</button>
       </div>
     </div>
   </div>
