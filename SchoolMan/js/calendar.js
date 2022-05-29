@@ -189,7 +189,7 @@ function updateCalendarHTML(response){
             
                 //add delete task button event
                 $taskDelLink.click(function () {
-                    var taskID = $(this).parent().attr('taskID');
+                    var taskID = $(this).parent().attr('id');
                     removeTask(this, taskID);
                 });
             }
