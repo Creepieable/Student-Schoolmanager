@@ -81,7 +81,7 @@ function getNotes(){
         INNER JOIN logintokens ON notes.userID = logintokens.userID 
             WHERE logintokens.token = ?
             AND noteID IN ($placeholders)
-            ORDER BY notes.noteID;");
+            ORDER BY notes.title;");
         $stmt->bind_param("s".$bindStr, $token,...$noteIDs);
     }
     else{
@@ -89,7 +89,7 @@ function getNotes(){
         $stmt = $db->prepare("SELECT notes.noteID, notes.title, notes.text, notes.colour FROM notes 
                                 INNER JOIN logintokens ON notes.userID = logintokens.userID 
                                 WHERE logintokens.token = ?
-                                ORDER BY notes.noteID;");
+                                ORDER BY notes.title;");
         $stmt->bind_param("s", $token);   
     }
     try{

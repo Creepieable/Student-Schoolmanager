@@ -11,6 +11,7 @@
     <script src="./lib/JQuery/js/jquery-3.6.0.min.js"></script>
     <script src="./lib/js-cookie/js.cookie.min.js"></script>
     <script src="./lib/bootstrap-5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
     <script src="./js/userMan.js"></script>
     <script src="./js/calendar.js"></script>
 
@@ -179,7 +180,9 @@
           <input type="text" class="form-control" placeholder="meine neue Notiz..." id="noteTitleInput" required>
           <input type="color" class="form-control form-control-color" id="noteColourInput" value="#f8f9fa" style="max-width: 40px;">
         </div>
-        <textarea class="form-control" id="noteTextInput" style="min-height: 10em;" required></textarea>
+        <textarea class="form-control mb-1" id="noteTextInput" style="min-height: 10em;" required></textarea>
+
+      <span style="font-size: .8em;">Du kannst in deinen <i>Notizen</i> dinge mit <a href="https://www.markdownguide.org/basic-syntax/">Markdown</a> <b>hervorheben</b>!</span>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">abbrechen</button>
@@ -191,15 +194,69 @@
 
 <!--del Task confirm Modal-->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="deleteConfirmModalLabel">Kaleinereintrag wirklich löschen?</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-header">
+        Gelöschte kalendereinträge können nicht wiederhergestellt werden! <br>
+        Notizen bleiben erhalten.
+      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="margin-right: auto;">abbrechen</button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confimDelete">löschen</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confimTaskDelete">löschen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- write Note Modal -->
+<div class="modal fade" id="newNoteModal" tabindex="-1" aria-labelledby="newNoteModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newNoteModalTitle">Neue Notiz:</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="meine neue Notiz..." id="noteTitleInput" required>
+          <input type="color" class="form-control form-control-color" id="noteColourInput" value="#f8f9fa" style="max-width: 40px;">
+        </div>
+        <textarea class="form-control mb-1" id="noteTextInput" style="min-height: 10em;" required></textarea>
+
+      <span style="font-size: .8em;">Du kannst in deinen <i>Notizen</i> dinge mit <a href="https://www.markdownguide.org/basic-syntax/">Markdown</a> <b>hervorheben</b>!</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">abbrechen</button>
+        <button id="addNoteConfirm" type="button" class="btn btn-success">Notiz hinzufügen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- edit Note Modal -->
+<div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editNoteModalTitle">Notiz bearbeiten:</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="meine neue Notiz..." id="editNoteTitleInput" required>
+          <input type="color" class="form-control form-control-color" id="editNoteColourInput" value="#f8f9fa" style="max-width: 40px;">
+        </div>
+        <textarea class="form-control mb-1" id="editNoteTextInput" style="min-height: 10em;" required></textarea>
+
+      <span style="font-size: .8em;">Du kannst in deinen <i>Notizen</i> dinge mit <a href="https://www.markdownguide.org/basic-syntax/">Markdown</a> <b>hervorheben</b>!</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">abbrechen</button>
+        <button id="editNoteNoteConfirm" type="button" class="btn btn-success">Notiz aktualisieren</button>
       </div>
     </div>
   </div>
@@ -207,15 +264,21 @@
 
 <!--rm Note confirm Modal-->
 <div class="modal fade" id="rmNoteConfirmModal" tabindex="-1" aria-labelledby="rmNoteConfirmModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="rmNoteConfirmModalLabel">Notiz wirklich entfernen?</h5>
+        <h5 class="modal-title" id="rmNoteConfirmModalLabel">Notiz entfernen/löschen?</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          Notiz entfernen oder entgültig löschen?
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="margin-right: auto;">abbrechen</button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confimRemove">entfernen</button>
+        <div class="btn-group me-2" role="group" aria-label="rmGroup">
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" id="confimNoteRemove">entfernen</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confimNoteDelete">löschen</button>
+        </div>
       </div>
     </div>
   </div>

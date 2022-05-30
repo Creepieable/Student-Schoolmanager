@@ -44,13 +44,23 @@ $(document).ready(function() {
     });
 
     //taskDel Modal confirm delete button event
-    $(document).on("click","#confimDelete", function () {
-        removeTaskConfirmed();
+    $(document).on("click","#confimTaskDelete", function () {
+        deleteTaskConfirmed();
     });
 
     //noteRm Modal confirm rm button event
-    $(document).on("click","#confimRemove", function () {
+    $(document).on("click","#confimNoteRemove", function () {
         removeNoteFromtaskConfirm();
+    });
+
+    //noteRm Modal confirm rm button event
+    $(document).on("click","#confimNoteDelete", function () {
+        deleteNoteFromtaskConfirm();
+    });
+
+    //noteEdit Modal confirm confirm button event
+    $(document).on("click","#editNoteNoteConfirm", function () {
+        editNoteConfirm();
     });
 
     //addNoteSelect change envent
@@ -255,7 +265,7 @@ function removeTask(taskElem ,taskID){
     var deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
     deleteConfirmModal.show();
 }
-function removeTaskConfirmed(){
+function deleteTaskConfirmed(){
     console.log(delTaskID);
 
     $.ajax({
@@ -329,7 +339,15 @@ function createNoteCard(noteID, title, text, colour){
                             <div class="card-header">\
                                 <div class="row">\
                                     <div class="col-10"><h5 class="card-header-text my-auto"></h5></div>\
-                                    <div class="col-2 text-end"><button type="button" class="btn btn-danger btn-sm noteDelBtn" style="height: 24px; width: 24px;"></button></div>\
+                                    <div class="col-2 text-end">\
+                                        <div class="dropdown">\
+                                            <button class="btn btn-danger" type="button" id="noteDropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="height: 24px; width: 24px;"></button>\
+                                            <ul class="dropdown-menu" aria-labelledby="noteDropdownMenuButton">\
+                                            <li><a class="dropdown-item noteEditBtn">bearbeiten</a></li>\
+                                            <li><a class="dropdown-item noteDelBtn">entfernen</a></li>\
+                                            </ul>\
+                                        </div>\
+                                    </div>\
                                 </div>\
                             </div>\
                             <div class="card-body">\
@@ -342,13 +360,22 @@ function createNoteCard(noteID, title, text, colour){
     //change text color if bg is too dark
     if(wc_hex_is_dark(colour)) $noteCard.find('.card-header-text').css('color', 'white');
 
+    //fill Notecard
     $noteCard.find('.card-header').css('background-color', '#'+colour);
     $noteCard.find('.card-header-text').text(title);
-    $noteCard.find('.card-text').text(text);
+
+    //convert Markdown to html
+    html = new showdown.Converter().makeHtml(text);
+    $noteCard.find('.card-text').html(html);
 
     $noteCard.find('.noteDelBtn').click(function () {
         let id = parseInt($(this).closest('.card').attr('noteID'));
         removeNoteFromtask(id, $(this).closest('.card'));
+    });
+
+    $noteCard.find('.noteEditBtn').click(function () {
+        let id = parseInt($(this).closest('.card').attr('noteID'));
+        editNote(id, $(this).closest('.card'));
     });
 
     return $noteCard;
@@ -360,6 +387,7 @@ function writeNewNoteForTask(taskID){
     let noteTitle = $('#noteTitleInput').val();
     let noteColour = $('#noteColourInput').val();
     let noteText = $('#noteTextInput').val();
+    noteText = noteText.replace(/\n\r?/g, '<br />');
 
     let postJSON = {
                         "request":"POST",
@@ -469,7 +497,7 @@ function addNotesByIDs(taskID, noteIDs){
     }); 
 }
 
-//remove note from task
+//remove/edit note from task
 let rmID = null;
 let rmNoteElem = null;
 function removeNoteFromtask(noteID, noteElem){
@@ -498,6 +526,120 @@ function removeNoteFromtaskConfirm(){
             console.log(error);
         }
     });  
+}
+function deleteNoteFromtaskConfirm(){
+    if(Array.isArray(rmID)){
+        console.warn('deleteNoteFromtaskConfirm() | rmID cannot be of type Array');
+        return;
+    }
+
+    $.ajax({
+        url: "./API/notes.php",
+        type: 'DELETE',
+        headers: {"usr-token":userToken,
+                  "note-id":rmID.toString()
+                },
+        dataType: "json",
+        success: function(response) {
+            //console.log(response);
+            $(rmNoteElem).remove();
+
+            $taskButton = $('#'+$('#offcanvasNotes').attr('taskID'));
+            rmNoteID($taskButton, rmID);
+            fillNoteDatalist();
+        },
+        error: function(xhr, status, error){
+            var errorMessage = xhr.status + ': ' + xhr.statusText
+            console.error('Error - ' + errorMessage);
+            console.log(error);
+        }
+    });  
+}
+
+//note Editing
+let editID = null;
+let $editNoteElem = null;
+function editNote(noteID, $noteElem){
+    editID = noteID;
+    $editNoteElem = $noteElem;
+
+    //get original note text
+    $.ajax({
+        url: "./API/notes.php",
+        type: 'GET',
+        async: false,
+        headers: {"usr-token":userToken,
+                  "note-ids": noteID.toString()},
+        dataType: "json",
+        success: function(response) {
+            $('#editNoteColourInput').val('#'+response.notes[0].colour);
+            $('#editNoteTitleInput').val(response.notes[0].title);
+            var noteText = response.notes[0].text.replace(/<br\s*[\/]?>/gi, '\n');
+            $('#editNoteTextInput').val(noteText);
+        },
+        error: function(xhr, status, error){
+            var errorMessage = xhr.status + ': ' + xhr.statusText
+            console.error('Error - ' + errorMessage);
+            console.log(error);
+            return;
+        }
+    }); 
+    
+
+    var deleteConfirmModal = new bootstrap.Modal(document.getElementById('editNoteModal'));
+    deleteConfirmModal.show();
+}
+function editNoteConfirm(){
+    let noteColour = $('#editNoteColourInput').val();
+    let noteTitle = $('#editNoteTitleInput').val();
+    let noteText = $('#editNoteTextInput').val();
+    noteText = noteText.replace(/\n\r?/g, '<br />');
+
+    let postJSON = {
+        "request":"PATCH",
+        "type":"notes",
+        "data":{
+            "title": noteTitle,
+            "text": noteText,
+            "colour": noteColour.substring(1)
+        }
+    }
+
+    $.ajax({
+        url: "./API/notes.php",
+        type: 'PATCH',
+        headers: {"usr-token":userToken,
+                  "note-id": editID.toString()},
+        dataType: "json",
+        data: JSON.stringify(postJSON),
+        success: function(response) {
+            let colour = $('#editNoteColourInput').val();
+            let title = $('#editNoteTitleInput').val();
+            let text = $('#editNoteTextInput').val();
+
+            //reset modal
+            var notesModal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
+            notesModal.hide();
+
+            //change text color if bg is too dark
+            if(wc_hex_is_dark(colour.substring(1))) $editNoteElem.find('.card-header-text').css('color', 'white');
+            else $editNoteElem.find('.card-header-text').css('color', 'black');
+
+            //fill Notecard
+            $editNoteElem.find('.card-header').css('background-color', colour);
+            $editNoteElem.find('.card-header-text').text(title);
+
+            //convert Markdown to html
+            text = text.replace(/\n\r?/g, '<br />');
+            html = new showdown.Converter().makeHtml(text);
+            $editNoteElem.find('.card-text').html(html);
+        },
+            error: function(xhr, status, error){
+            var errorMessage = xhr.status + ': ' + xhr.statusText
+            console.error('Error - ' + errorMessage);
+            console.log(error);
+        }
+    }); 
 }
 
 ////calendar interface funtions
