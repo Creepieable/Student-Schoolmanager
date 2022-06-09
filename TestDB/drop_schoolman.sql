@@ -16,10 +16,12 @@
 
 
 -- Dumping database structure for schoolman
+DROP DATABASE IF EXISTS `schoolman`;
 CREATE DATABASE IF NOT EXISTS `schoolman` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
 USE `schoolman`;
 
 -- Dumping structure for table schoolman.logintokens
+DROP TABLE IF EXISTS `logintokens`;
 CREATE TABLE IF NOT EXISTS `logintokens` (
   `token` varbinary(64) NOT NULL,
   `userID` int(10) unsigned NOT NULL,
@@ -37,6 +39,7 @@ REPLACE INTO `logintokens` (`token`, `userID`, `created`, `expiresIn`) VALUES
 	(_binary 0x65373263373334356364663166396431303335316430663764316639316365333130646564646536326265643366303835636634316639353966303637356638, 1, '2022-05-29 13:10:22', 2628000);
 
 -- Dumping structure for table schoolman.notes
+DROP TABLE IF EXISTS `notes`;
 CREATE TABLE IF NOT EXISTS `notes` (
   `noteID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userID` int(10) unsigned NOT NULL,
@@ -61,6 +64,7 @@ REPLACE INTO `notes` (`noteID`, `userID`, `taskID`, `title`, `text`, `colour`) V
 	(23, 1, 12, 'Ich hab ihn ganz doll liiiieb 🥰🥰🥰', 'LIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEB', 'ff4d4d');
 
 -- Dumping structure for table schoolman.schedule
+DROP TABLE IF EXISTS `schedule`;
 CREATE TABLE IF NOT EXISTS `schedule` (
   `scheduleID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userID` int(10) unsigned NOT NULL,
@@ -78,6 +82,7 @@ REPLACE INTO `schedule` (`scheduleID`, `userID`, `title`) VALUES
 	(4, 1, 'A - Woche:');
 
 -- Dumping structure for table schoolman.scheduleentry
+DROP TABLE IF EXISTS `scheduleentry`;
 CREATE TABLE IF NOT EXISTS `scheduleentry` (
   `scheduleID` int(10) unsigned NOT NULL,
   `row` int(10) unsigned NOT NULL,
@@ -101,7 +106,7 @@ CREATE TABLE IF NOT EXISTS `scheduleentry` (
   CONSTRAINT `FK_scheduleentry_subjects_5` FOREIGN KEY (`friday`) REFERENCES `subjects` (`subjectID`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table schoolman.scheduleentry: ~13 rows (approximately)
+-- Dumping data for table schoolman.scheduleentry: ~14 rows (approximately)
 REPLACE INTO `scheduleentry` (`scheduleID`, `row`, `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `time`) VALUES
 	(1, 0, 5, 5, 5, 5, 5, '00:00'),
 	(1, 1, 5, 5, NULL, 5, 5, '00:00'),
@@ -119,6 +124,7 @@ REPLACE INTO `scheduleentry` (`scheduleID`, `row`, `monday`, `tuesday`, `wednesd
 	(4, 3, 5, 5, NULL, 5, 5, '00:00');
 
 -- Dumping structure for table schoolman.subjects
+DROP TABLE IF EXISTS `subjects`;
 CREATE TABLE IF NOT EXISTS `subjects` (
   `subjectID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -127,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `subjects` (
   PRIMARY KEY (`subjectID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table schoolman.subjects: ~23 rows (approximately)
+-- Dumping data for table schoolman.subjects: ~24 rows (approximately)
 REPLACE INTO `subjects` (`subjectID`, `name`, `abbr`, `colour`) VALUES
 	(1, 'Ehtik', 'ETH', 'f7f414'),
 	(2, 'G/R/W', 'GRW', '5478b3'),
@@ -155,6 +161,7 @@ REPLACE INTO `subjects` (`subjectID`, `name`, `abbr`, `colour`) VALUES
 	(24, 'Sport', 'SP', '000000');
 
 -- Dumping structure for table schoolman.tasks
+DROP TABLE IF EXISTS `tasks`;
 CREATE TABLE IF NOT EXISTS `tasks` (
   `taskID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userID` int(10) unsigned NOT NULL,
@@ -167,7 +174,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   CONSTRAINT `taskUserID_FK1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table schoolman.tasks: ~7 rows (approximately)
+-- Dumping data for table schoolman.tasks: ~6 rows (approximately)
 REPLACE INTO `tasks` (`taskID`, `userID`, `title`, `dueBy`, `isTimed`, `colour`) VALUES
 	(12, 1, 'Fahninani', '2022-06-15 10:00:00', 0, 'ff9500'),
 	(13, 1, 'Fußball dadada', '2022-06-15 10:00:00', 0, 'ff00f7'),
@@ -177,6 +184,7 @@ REPLACE INTO `tasks` (`taskID`, `userID`, `title`, `dueBy`, `isTimed`, `colour`)
 	(19, 1, 'Chorprobe', '2022-06-06 14:30:00', 1, '000c1f');
 
 -- Dumping structure for table schoolman.users
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `userID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(32) NOT NULL,
@@ -189,7 +197,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `useremail` (`email`) USING HASH
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table schoolman.users: ~0 rows (approximately)
+-- Dumping data for table schoolman.users: ~2 rows (approximately)
 REPLACE INTO `users` (`userID`, `name`, `email`, `passwd`, `salt`, `created`) VALUES
 	(1, 'dertestmensch', 'test@mensch.erde', '7a9690e30e844c22113ab154a175b416b28ea59ae73c094a6ccf5c24800d3b9c', ' ({2hL>vblz4l\'>ND4uf_', '2022-05-26 11:46:18'),
 	(2, 'fahni', 'fahni@nani.com', '3b20c178607d7fcf59cd159ed5a28363ba1d4b433b8793d18d572848241b5577', ' PSF]NQB:as3kE7d!-htW', '2022-05-29 21:16:05');
