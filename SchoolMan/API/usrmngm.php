@@ -61,18 +61,7 @@ else{
 function register($POSTjson){
     global $dbHost, $dbUsr, $dbPw, $dbName;
     $db = new mysqli($dbHost, $dbUsr, $dbPw, $dbName);
-    if ($db -> connect_errno) {
-        $regObj = new \stdClass();
-            $regObj->type = 'register';
-            $regObj->status = 'error';
-            $regObj->error = 'server database error';
-        
-            $respJSON = json_encode($regObj);
-            echo $respJSON;
-            http_response_code(500); exit(); 
-    }
-    try {
-    $stmt = $db->prepare('INSERT INTO users (name, email, passwd, salt) VALUES (?, ?, ?, ?);');
+
     $username = strtolower(strval($POSTjson->data->name));
     $email = strtolower(strval($POSTjson->data->email));
     $password = strval($POSTjson->data->saltedPasswordHash);
@@ -103,9 +92,27 @@ function register($POSTjson){
         http_response_code(406); exit();
     }
 
-    $stmt->bind_param('ssss', $username, $email, $password, $salt);
-
+    if ($db -> connect_errno) {
+        $regObj = new \stdClass();
+            $regObj->type = 'register';
+            $regObj->status = 'error';
+            $regObj->error = 'server database error';
+        
+            $respJSON = json_encode($regObj);
+            echo $respJSON;
+            http_response_code(500); exit(); 
+    }
+    try {
+    $stmt = $db->prepare('INSERT INTO users (name, email, passwd) VALUES (?, ?, ?);');
+    $stmt->bind_param('sss', $username, $email, $password);
     $stmt->execute();
+
+    $insertedUserId = $db->insert_id;       
+
+    $stmt = $db->prepare('INSERT INTO salt (userID, salt) VALUES (?, ?);');
+    $stmt->bind_param('is',$insertedUserId , $salt);
+    $stmt->execute();
+
     } catch (Exception $e) {
         if($e->getCode() === 1062){
             $regObj = new \stdClass();
@@ -151,7 +158,8 @@ function gequestSalt($POSTjson){
         http_response_code(500);
         exit();
     }
-    $stmt = $db->prepare('SELECT salt FROM users WHERE name=? OR email=?;');
+    $stmt = $db->prepare('SELECT salt FROM salt
+	                        WHERE userID = (SELECT userID FROM users WHERE name=? OR email=?);');
     $user = strtolower(strval($POSTjson->data->name));
     $stmt->bind_param('ss', $user, $user);
 

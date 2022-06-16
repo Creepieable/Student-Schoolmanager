@@ -6,13 +6,17 @@ else{
     Cookies.remove('__scman_us_t');
 }
 
-$(document).on('click','#submit-btn', function () {  
-    login();
-});
-$('.loginTB').on("keypress", function(e){
-    if(e.which == 13){
-        $("body").append("<p>You've pressed the enter key!</p>");
-    }
+$(document).ready(function() {
+    $('#errMsg').hide();
+
+    $(document).on('click','#submit-btn', function () {  
+        login();
+    });
+    $('.loginTB').on("keypress", function(e){
+        if(e.which == 13){
+            $("body").append("<p>You've pressed the enter key!</p>");
+        }
+    });
 });
 
 function login(){
@@ -70,6 +74,8 @@ function login(){
                     var errorMessage = xhr.status + ': ' + xhr.statusText
                     console.log('Error - ' + errorMessage);
                     console.log(error);
+
+                    if(xhr.status === 404) userNotFoundMsg();
                 }
             });
         },
@@ -77,6 +83,17 @@ function login(){
             var errorMessage = xhr.status + ': ' + xhr.statusText
             console.log('Error - ' + errorMessage);
             console.log(error);
+
+            if(xhr.status === 404) userNotFoundMsg();
         }
     });
+}
+
+function userNotFoundMsg(){
+    $('#errMsg').show();
+    setTimeout(fadeMsg, 2000);
+}
+
+function fadeMsg(){
+    $('#errMsg').fadeOut(400);
 }

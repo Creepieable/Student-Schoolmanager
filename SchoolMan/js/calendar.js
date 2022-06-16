@@ -150,13 +150,14 @@ function updateCalendarHTML(response){
         $.each(response.tasks, function( index, value ) {
             let taskDate = new Date((value.dueBy)*1000);
             if(dayDate.getDate() == taskDate.getDate() && dayDate.getMonth() == taskDate.getMonth() && dayDate.getFullYear() == taskDate.getFullYear()){
-                let $taskSpan = $('<span></span>');
+                let $taskSpan = $('<span class="taskelem"></span>');
                 let $taskNoteLink = $('<a type="button" class="task-note-link text-left fw-bold" style="text-decoration: none;"></a>');
                 let $taskDelLink = $('<a type="button" class="task-del-link text-danger fw-bold ms-1" style="text-decoration: none;">-</a>');
 
                 $taskNoteLink.css("color", '#'+value.colour);
-                    
-                $taskSpan.attr('noteIDs', value.notes);
+                
+                if(value.notes === null) $taskSpan.attr('noteIDs', '')
+                else $taskSpan.attr('noteIDs', value.notes);
                 $taskSpan.attr('id', value.taskID);
 
                 $taskNoteLink.text(value.title + ' (Notizen)');
@@ -476,6 +477,16 @@ function addNotesByIDs(taskID, noteIDs){
                     });
 
                     $taskButton = $('#'+$('#offcanvasNotes').attr('taskID'));
+                    
+                    //change note IDs on buttons
+                    $(".taskelem").each(function(i, obj) {
+                        let $buttonElem = $(obj);
+                        let ids = getNoteIDs($buttonElem);
+                        if(ids.includes(String(noteIDs))){
+                            rmNoteID($buttonElem, noteIDs);
+                        }
+                    });
+
                     addNoteID($taskButton, noteIDs);
                 },
                 error: function(xhr, status, error){
@@ -766,6 +777,14 @@ function rmNoteID($buttonElem, rmID){
     }
 
     $buttonElem.attr('noteIDs', ids.toString());
+}
+
+function getNoteIDs($buttonElem){
+    let ids = $buttonElem.attr('noteIDs');
+    if(ids !== undefined){
+        return ids.split(',');
+    }
+    else return [];
 }
 
 function wc_hex_is_dark(color) {

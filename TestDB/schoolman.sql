@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               10.4.24-MariaDB - mariadb.org binary distribution
+-- Server version:               10.4.13-MariaDB - mariadb.org binary distribution
 -- Server OS:                    Win64
 -- HeidiSQL Version:             12.0.0.6468
 -- --------------------------------------------------------
@@ -30,9 +30,10 @@ CREATE TABLE IF NOT EXISTS `logintokens` (
   CONSTRAINT `tokenUserID_FK1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table schoolman.logintokens: ~3 rows (approximately)
+-- Dumping data for table schoolman.logintokens: ~4 rows (approximately)
 REPLACE INTO `logintokens` (`token`, `userID`, `created`, `expiresIn`) VALUES
 	(_binary 0x30383536633338326638396234616464663231353564336362363362636537656539326633356365323433366164646331363830376433616466383064363861, 1, '2022-05-30 12:13:21', 2628000),
+	(_binary 0x30643262626331643933663233303564626161303031653436636132646166313064393738663262303163633461326161303138353539353430303063363539, 1, '2022-06-16 09:59:31', 2628000),
 	(_binary 0x62616234653937646236653832356334386561643930386631343433396133643138663264663439346561346239363833323165366234303333323165366431, 1, '2022-05-28 17:02:39', 2628000),
 	(_binary 0x65373263373334356364663166396431303335316430663764316639316365333130646564646536326265643366303835636634316639353966303637356638, 1, '2022-05-29 13:10:22', 2628000);
 
@@ -57,8 +58,21 @@ REPLACE INTO `notes` (`noteID`, `userID`, `taskID`, `title`, `text`, `colour`) V
 	(9, 1, 12, 'Pupsen tut er ab und zu.', 'Wenn er pupst um mich zu ärgern bekommt er einen Flaps auf seinen frechen Flipspopo.', '83fb85'),
 	(11, 1, 19, 'ALS ICH FORTGING', 'Als ich fortging war die Straße steil - kehr wieder um<br />Nimm an ihrem Kummer teil, mach sie heil<br />Als ich fortging war der Asphalt heiß - kehr wieder um<br />Red ihr aus um jeden Preis, was sie weiß<br /><br />Nichts ist unendlich, so sieh das doch ein<br />Ich weiß, du willst unendlich sein - schwach und klein<br />Feuer brennt nieder, wenn′s keiner mehr nährt<br />Kenn ja selber, was dir heut widerfährt<br /><br />Als ich fortging warn die arme leer - kehr wieder um<br />Mach\'s ihr leichter, einmal mehr, nicht so schwer<br />Als ich fortging, kam ein Wind, so schwach, warf mich nicht um<br />Unter ihrem Tränendach war ich schwach<br /><br />Nichts ist unendlich, so sieh das doch ein<br />Ich weiß, du willst unendlich sein, schwach und klein<br />Nichts ist von Dauer, wenn′s keiner recht will<br />Auch die trauer wird da sein, schwach und klein', '171730'),
 	(12, 1, 12, 'Mein Kleiner Drache Fahninan', 'Ich habe einen kleinen Drachen.<br />Er spuckt kein Feuer, sondern faucht.<br />Er hat viel Spaß am Unsinn machen.<br />Und muss ins Freie, wenn er raucht.', 'ff7b00'),
-	(17, 2, 15, 'Knuddels', 'KNUDDELS!', '00e1ff'),
+	(17, 2, 17, 'Knuddels', 'KNÖDDELS!', '00e1ff'),
 	(23, 1, 12, 'Ich hab ihn ganz doll liiiieb 🥰🥰🥰', 'LIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEB', 'ff4d4d');
+
+-- Dumping structure for table schoolman.salt
+CREATE TABLE IF NOT EXISTS `salt` (
+  `userID` int(10) unsigned NOT NULL,
+  `Salt` text DEFAULT '',
+  PRIMARY KEY (`userID`),
+  CONSTRAINT `FK_salt_users` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Dumping data for table schoolman.salt: ~2 rows (approximately)
+REPLACE INTO `salt` (`userID`, `Salt`) VALUES
+	(1, ' ({2hL>vblz4l\'>ND4uf_'),
+	(2, ' PSF]NQB:as3kE7d!-htW');
 
 -- Dumping structure for table schoolman.schedule
 CREATE TABLE IF NOT EXISTS `schedule` (
@@ -101,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `scheduleentry` (
   CONSTRAINT `FK_scheduleentry_subjects_5` FOREIGN KEY (`friday`) REFERENCES `subjects` (`subjectID`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table schoolman.scheduleentry: ~13 rows (approximately)
+-- Dumping data for table schoolman.scheduleentry: ~14 rows (approximately)
 REPLACE INTO `scheduleentry` (`scheduleID`, `row`, `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `time`) VALUES
 	(1, 0, 5, 5, 5, 5, 5, '00:00'),
 	(1, 1, 5, 5, NULL, 5, 5, '00:00'),
@@ -127,7 +141,7 @@ CREATE TABLE IF NOT EXISTS `subjects` (
   PRIMARY KEY (`subjectID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table schoolman.subjects: ~23 rows (approximately)
+-- Dumping data for table schoolman.subjects: ~24 rows (approximately)
 REPLACE INTO `subjects` (`subjectID`, `name`, `abbr`, `colour`) VALUES
 	(1, 'Ehtik', 'ETH', 'f7f414'),
 	(2, 'G/R/W', 'GRW', '5478b3'),
@@ -167,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   CONSTRAINT `taskUserID_FK1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table schoolman.tasks: ~7 rows (approximately)
+-- Dumping data for table schoolman.tasks: ~6 rows (approximately)
 REPLACE INTO `tasks` (`taskID`, `userID`, `title`, `dueBy`, `isTimed`, `colour`) VALUES
 	(12, 1, 'Fahninani', '2022-06-15 10:00:00', 0, 'ff9500'),
 	(13, 1, 'Fußball dadada', '2022-06-15 10:00:00', 0, 'ff00f7'),
@@ -182,17 +196,16 @@ CREATE TABLE IF NOT EXISTS `users` (
   `name` varchar(32) NOT NULL,
   `email` text NOT NULL,
   `passwd` text NOT NULL,
-  `salt` text CHARACTER SET armscii8 NOT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`userID`),
   UNIQUE KEY `username` (`name`),
   UNIQUE KEY `useremail` (`email`) USING HASH
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table schoolman.users: ~0 rows (approximately)
-REPLACE INTO `users` (`userID`, `name`, `email`, `passwd`, `salt`, `created`) VALUES
-	(1, 'dertestmensch', 'test@mensch.erde', '7a9690e30e844c22113ab154a175b416b28ea59ae73c094a6ccf5c24800d3b9c', ' ({2hL>vblz4l\'>ND4uf_', '2022-05-26 11:46:18'),
-	(2, 'fahni', 'fahni@nani.com', '3b20c178607d7fcf59cd159ed5a28363ba1d4b433b8793d18d572848241b5577', ' PSF]NQB:as3kE7d!-htW', '2022-05-29 21:16:05');
+-- Dumping data for table schoolman.users: ~2 rows (approximately)
+REPLACE INTO `users` (`userID`, `name`, `email`, `passwd`, `created`) VALUES
+	(1, 'jay', 'jay@fufu.here', '5bc2b40b464bb129f215a89efe6b0f9041233749882f991ffd99b79e8d572d80', '2022-05-26 11:46:18'),
+	(2, 'fahni', 'fahni@nani.com', '5c92b1874173fa3751a1a59817ad2dbcd3d656f06f0cb9448f4581859802324e', '2022-05-29 21:16:05');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
