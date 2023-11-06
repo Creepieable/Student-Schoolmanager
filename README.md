@@ -1,3 +1,7 @@
+Please view the issues before doing anything with this.
+
+-----
+
 Dieses Projekt ist Bestandteil einer komplexen Leistung, im Fach Informatik, am [Leipzig-Kolleg](https://cms.sachsen.schule/leipzigkolleg/startseite/), des Schülers Johannes Bela.
 
 # Student-Schoolmanager:
